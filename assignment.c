@@ -56,7 +56,7 @@ task main()
 	}
 	//redPoint location store.
 	findShortestDistance();
-
+	ff();
 
 
 
