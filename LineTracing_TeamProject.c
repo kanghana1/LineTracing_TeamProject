@@ -181,13 +181,13 @@ int calcBound(){ // boundary value
    		yellow += b; // yellow and white have the big gap between value b
             sleep(10);
 	}
-      setMotorSpeed(lm,0);
+      setMotorSpeed(lm,0); // 이 움직이는 부분들도 어디가 벗어났냐에 따라 다른 방향으로 움직이도록 짜야할 거 같습니다.
       setMotorSpeed(rm,40);
       sleep(300);
       setMotorSpeed(lm,0);
       setMotorSpeed(rm,0);
 
-      for(int i =0;i<20;i++){
+      for(int i = 0 ; i < 20 ; i++) {
             getColorRGB(cs,r,g,b);
    		white += b ;   // yellow and white have the big gap between value b
             sleep(10);
@@ -200,6 +200,7 @@ int calcBound(){ // boundary value
 /*
 이거 위 calcBound에서 구한 bound값을 이용해 트레이싱 하는 알고리즘으로 바꾼 후,
 moveRobot 함수 안에 넣어야 하지 않을까요??
+색 개수는 필요 없다고 합니다
 
 void cross(){
 
