@@ -56,14 +56,14 @@ void tracing() // Boundary area linetracing
 
 
 void turnRight() { 
-      setMotorSpeed(rm, -(speed/2));
-      setMotorSpeed(lm, speed/2);
-      sleep(2000);
+      setMotorSpeed(rm, -(speed));
+      setMotorSpeed(lm, speed);
+      sleep(2000); // sleep값 다시 찾기
 }
 
 void turnLeft() { 
-      setMotorSpeed(lm, -(speed/2));
-      setMotorSpeed(rm, speed/2);
+      setMotorSpeed(lm, -(speed));
+      setMotorSpeed(rm, speed);
       sleep(2000);
 }
 
@@ -146,6 +146,8 @@ void printPatch() { //
 void moveRobot() {
       while(1) {
 
+            tracing();
+
             if (y == 4 && x == 4) {
             	go(0);
             	sleep(5000);
@@ -159,7 +161,7 @@ void moveRobot() {
             }
 
             while (x >= 0 && x <= 4) {
-                  go(speed);
+                  tracing();
                   if ((getColorLeft() == YELLOW_COLOR || getColorRight() == YELLOW_COLOR) && y % 2 == 0) { // cross
                         go(0);
                         sleep(500);
@@ -182,7 +184,7 @@ void moveRobot() {
             if (y % 2 == 0) { 
                   turnRight();
                   while(getColorRight() == WHITE_COLOR){
-                        go(speed);
+                        tracing();
                   }
                   go(0);
                   sleep(200);
@@ -196,7 +198,7 @@ void moveRobot() {
             else if (y % 2 == 1) {
                   turnLeft();
                   while(getColorLeft() == WHITE_COLOR) {
-                        go(speed);
+                        tracing();
                   }
                   go(0);
                   sleep(200);
