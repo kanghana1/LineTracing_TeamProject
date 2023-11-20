@@ -1,7 +1,9 @@
 #define MAX_POINTS 100 // max points
 #define MAX_DISTANCE 1000000000 // max distance
 #define INF 987654321
-
+#include <stdio.h>
+#include <stdbool.h>
+//colorMapping must be a global variable
 /*explanation function & variables
 1. point = the location of point(x, y)
 2. calculate = calcualte the distance of point1 and point2. return distance.
@@ -21,49 +23,78 @@
 
 
 typedef struct Point {
-	int x;
-	int y;
+	int r;
+	int c;
 } Point;
-
+Point currentPosition = {4, 4}; // start point. 
+int score = 0; // the number of red patches that robot gets.
 
 float Calculate(Point point1, Point point2){ //calculate the distance of point1 and point2. 
-	return abs((point1.x + point1.y) - (point2.x + point2.y));
+	return abs((point1.r + point1.c) - (point2.r + point2.c));
 }
 
-float findShortestDistance(Point currentPosition, Point redPoint, int redPointCount){
+Point findShortestDistance(Point currentPosition, Point redPoint[], int redPointCount){ // send redPoint array. compare each elements
 	float shortestDistance = MAX_DISTANCE;
+	Point shortest_redPatch;
 
 	for (int i = 0; i < redPointCount; i++){
-		float distance = Calculate(currentPosition, redPoint);
+		float distance = Calculate(currentPosition, redPoint[i]);
 		if (distance < shortestDistance) {
 			shortestDistance = distance;
+			shortest_redPatch.r = redPoint[i].r;
+			shortest_redPatch.c = redPoint[i].c;
 		}
 	}
 
-	return shortestDistance;
+	return shortest_redPatch; // it returns shortest_redPatch location x, y
 }
 
-
-Point currentPosition = {4, 4};
 bool isPointZero(Point point){
-	return (point.x == 0 && point.y == 0);
+	return (point.r == 0 && point.c == 0);
 }
 
-void bell_ford(grid, Point start, Point end){
-	rows = len(grid);
-	cols = len(grid[0]);
-	float distance[rows][cols];
 
-
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
-			distance[i][j] = grid[i][j];}}
+void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
+	for (int i = 0; i< 5; i++){
+		for (int j = 0; j < 5; j++){
+			array[i][j] = INF; // give initial values 
+		}
 	}
 
+	int offset_r, offset_c, limit_r, limit_c;
+
+	if (start.r > end.r){limit_r = start.r; offset_r = end.r;}
+	else{limit_r = end.r; offset_r = start.r;}
+
+	if (start.c > end.c){limit_c = start.c; offset_c = end.c;}
+	else{limit_c = end.c; offset_c = start.c;}
+	// to copy array 
+
+
+	// copy array 
+	for (int r = offset_r; r <= limit_r; r++){
+		for (int c = offset_c; c <= limit_c; c++){
+			array[r][c] = colorMapping[r][c];
+		}
+	}
+
+	return array;
+}
+
+void weight(Point start, Point end){
+	int weight_array[5][5];
+
+	bell_ford(start, end, weight_array);
+	// find weight / use lecture reference
+	 
+
+}
 task main()
 {
 	Point redPoint[MAX_POINTS];
 	int redPointCount = 0; //add points
+	int r, g, b;
+	if (getcolorRGB(r, g, b) == 2) {score++;} // add to LineTracing.c
 
 	for (int i = 0; i < 5; i++){
 		for (int j = 0; j < 5; j++){
@@ -73,10 +104,12 @@ task main()
 				redPointCount++;}
 		}
 	}
+
 	//redPoint location store.
-	findShortestDistance();
-	ff();
+	Point togo = findShortestDistance(currentPosition, redPoint, redPointCount); // first
+	bell_ford(currentPosition, togo);
+	
 
 
-
+	
 }
