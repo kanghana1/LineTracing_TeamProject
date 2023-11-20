@@ -55,19 +55,19 @@ void tracing() // Boundary area linetracing
 
 
 
-void turnRight() {
+void turnRight() { 
       setMotorSpeed(rm, -(speed/2));
       setMotorSpeed(lm, speed/2);
       sleep(2000);
 }
 
-void turnLeft() {
+void turnLeft() { 
       setMotorSpeed(lm, -(speed/2));
       setMotorSpeed(rm, speed/2);
       sleep(2000);
 }
 
-int getColorFront() {
+int getColorFront() { 
       int r,g,b;
       int red = 0, green = 0, blue = 0;
 
@@ -146,48 +146,52 @@ void printPatch() { //
 void moveRobot() {
       while(1) {
 
-
             if (y == 4 && x == 4) {
-
             	go(0);
             	sleep(5000);
             	break;
-
             }
             if (start_val == 0 && getColorRight() == YELLOW_COLOR) {
-                  colorMapping[y][x] = getColorFront();
+                  colorMapping[y][x] = getColorFront(); // 0,0에 색 넣기
                   go(speed); // don't count the cross on start point
                   sleep(500);
                   start_val = 1;
             }
 
-            while (x < 4) { // redefine
+            while (x >= 0 && x <= 4) {
                   go(speed);
                   if ((getColorLeft() == YELLOW_COLOR || getColorRight() == YELLOW_COLOR) && y % 2 == 0) { // cross
+                        go(0);
+                        sleep(500);
                         x++;
                         colorMapping[y][x] = getColorFront();
-                        go(speed);
+                        if (x == 4) break;
+                        go(speed); // 재측정 방지로 500ms동안 밀어주기
                         sleep(500);
                   }
                   else if ((getColorLeft() == YELLOW_COLOR || getColorRight() == YELLOW_COLOR) && y % 2 == 1) {
-                        colorMapping[y][x] = getColorFront();
                         x--;
-                        go(speed);
+                        colorMapping[y][x] = getColorFront();
+                        if (x == 0) break;
+                        go(speed); // 재측정 방지로 500ms동안 밀어주기
                         sleep(500);
                   }
                   displayBigTextLine(1,"%d, %d",y,x);
 
             }
-            if (y % 2 == 0) {
+            if (y % 2 == 0) { 
                   turnRight();
                   while(getColorRight() == WHITE_COLOR){
                         go(speed);
-
                   }
                   go(0);
                   sleep(200);
-                  turnRight();
                   y++;
+                  colorMapping[y][x] = getColorFront();
+                  turnRight();
+                  go(speed); // 재측정 방지로 500ms동안 밀어주기
+                  sleep(500);               
+
             }
             else if (y % 2 == 1) {
                   turnLeft();
@@ -196,8 +200,12 @@ void moveRobot() {
                   }
                   go(0);
                   sleep(200);
-                  turnLeft();
                   y++;
+                  colorMapping[y][x] = getColorFront();
+                  turnLeft();
+                  go(speed); // 재측정 방지로 500ms동안 밀어주기
+                  sleep(500);
+                  
             }
 
       }
@@ -207,7 +215,7 @@ void moveRobot() {
 
 
 task main() {
-
+	
       moveRobot();
       printPatch();
 }
