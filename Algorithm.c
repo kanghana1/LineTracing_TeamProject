@@ -9,13 +9,39 @@
 #define MAX_POINTS 100 // max points
 #define MAX_DISTANCE 1000000000 // max distance
 #define INF 987654321
-
+int top=-1;
 
 typedef struct Point {
    int r;
    int c;
 } Point;
 
+int IsEmpty(){
+    if(top<0)
+        return true;
+    else
+        return false;
+    }
+int IsFull(){
+    if(top>=MAX_STACK_SIZE-1)
+        return true;
+    else
+        return false;
+}
+ 
+void push(int value){
+    if(IsFull()==true)
+        printf("스택이 가득 찼습니다.");
+    else
+        stack[++top]=value; 
+}
+ 
+int pop(){
+    if(IsEmpty()==true)
+        printf("스택이 비었습니다.");
+    else 
+        return stack[top--];
+}
 
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
@@ -50,103 +76,174 @@ bool isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
 
-void bell_ford(int grid, Point start, Point end){
-   int rows = len(grid);
-   int cols = len(grid[0]);
-   float distance[rows][cols];
+void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
+	for (int i = 0; i< 5; i++){
+		for (int j = 0; j < 5; j++){
+			array[i][j] = 0; // give initial values 
+		}
+	}
+
+	int offset_r, offset_c, limit_r, limit_c;
+
+	if (start.r > end.r){limit_r = start.r; offset_r = end.r;}
+	else{limit_r = end.r; offset_r = start.r;}
+
+	if (start.c > end.c){limit_c = start.c; offset_c = end.c;}
+	else{limit_c = end.c; offset_c = start.c;}
+	// to copy array 
 
 
-   for (int i = 0; i < rows; i++)
-   {
-      for (int j = 0; j < cols; j++)
-      {
-         distance[i][j] = grid[i][j];
-      }
-   }
+	// copy array 
+	for (int r = offset_r; r <= limit_r; r++){
+		for (int c = offset_c; c <= limit_c; c++){
+			array[r][c] = colorMapping[r][c];
+		}
+	}
+
+	return array;
 }
 
 
+// // This method calculates the weight from the current location to the red patch located
+// //  at the shortest distance to helps the robot achieve optimal movement.
 
-// This method calculates the weight from the current location to the red patch located
-//  at the shortest distance to helps the robot achieve optimal movement.
+// int findDt(Point start, Point end, int arr[6][6])
+// { // !! S: information about the patch, Dt: information about weights.
 
-int findDt(Point start, Point end, int arr[6][6])
-{ // !! S: information about the patch, Dt: information about weights.
+// /* you don't need to look at this comments
+//    // int start_r, start_c, end_r, end_c; // redefine Pointing spot.
 
-/* you don't need to look at this comments
-   // int start_r, start_c, end_r, end_c; // redefine Pointing spot.
-
-   // for(int i=0; i<6; i++) // define INF array
-   // {
-   //    for(int j=0; j<6; j++)
-   //    {
-   //       smallDt[i][j] = INF;
-   //    }
-   // }
+//    // for(int i=0; i<6; i++) // define INF array
+//    // {
+//    //    for(int j=0; j<6; j++)
+//    //    {
+//    //       smallDt[i][j] = INF;
+//    //    }
+//    // }
 
 
-   // if (start.r>end.r && start.c>end.c) // redefine startingPoint, endingPoint
-   // {
-   //    start_r = start.r;
-   //    end_r = end.r;
-   //    start_c = start.c;
-   //    end_c = end.c;
-   // }
-   // else if(start.r<end.r && start.c<end.c)
-   // {
-   //    start_r = end.r;
-   //    end_r = start.r;
-   //    start_c = end.c;
-   //    end_c = start.c;
-   // }
+//    // if (start.r>end.r && start.c>end.c) // redefine startingPoint, endingPoint
+//    // {
+//    //    start_r = start.r;
+//    //    end_r = end.r;
+//    //    start_c = start.c;
+//    //    end_c = end.c;
+//    // }
+//    // else if(start.r<end.r && start.c<end.c)
+//    // {
+//    //    start_r = end.r;
+//    //    end_r = start.r;
+//    //    start_c = end.c;
+//    //    end_c = start.c;
+//    // }
 
-   // if (start.c>end.c)
-   // {  
-   //    start_c = start.c;
-   //    end_c = end.c;
-   // }
-   // else
-   // {
-   //    start_c = end.c;
-   //    end_c = end.c;
-   // }
-*/
+//    // if (start.c>end.c)
+//    // {  
+//    //    start_c = start.c;
+//    //    end_c = end.c;
+//    // }
+//    // else
+//    // {
+//    //    start_c = end.c;
+//    //    end_c = end.c;
+//    // }
+// */
 
-   int Small_r, Small_c, Large_r, Large_c;
+//    int Small_r, Small_c, Large_r, Large_c;
    
-   Small_r, Small_c = minPoint(start, end);
-   Large_r, Large_c = maxPoint(start, end);
+//    Small_r, Small_c = minPoint(start, end);
+//    Large_r, Large_c = maxPoint(start, end);
 
-   Point array_Start = {Small_r, Small_c}; // start point of the original array
-   Point array_End = {Large_r, Large_c}; // end point of the original array
+//    Point array_Start = {Small_r, Small_c}; // start point of the original array
+//    Point array_End = {Large_r, Large_c}; // end point of the original array
 
-   int size_r = abs(start.r - end.r) + 1; // array r_size
-   int size_c = abs(start.c - end.c) + 1; // array c_size
+//    int size_r = abs(start.r - end.r) + 1; // array r_size
+//    int size_c = abs(start.c - end.c) + 1; // array c_size
 
-   int smallDt[size_r][size_c]; // define small_array of Dt
-   int smallS[size_r][size_c]; // define small_array of S
+//    int smallDt[size_r][size_c]; // define small_array of Dt
+//    int smallS[size_r][size_c]; // define small_array of S
 
-   for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS
-   {
-      for (int j = 0; j < size_c; j++)
-      {
-         smallS[i][j] = arr[array_Start.r + i][array_Start.c + j]; // !!! why arr is error? because of fucking pointer!?
-      }
-   }
+//    for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS
+//    {
+//       for (int j = 0; j < size_c; j++)
+//       {
+//          smallS[i][j] = arr[array_Start.r + i][array_Start.c + j]; // !!! why arr is error? because of fucking pointer!?
+//       }
+//    }
 
 
-   for(int i=0; i<array_End.r+1; i++) // Weight calculation about small array.
-	{
-		for(int j=0; j<array_End.c+1; j++)
-			{
-			if(i==0 && j==0) smallDt[i][j] = smallS[i][j];
-			else if(i==0) smallDt[i][j] = smallDt[i][j-1] + smallS[i][j];
-			else if(j==0) smallDt[i][j] = smallDt[i-1][j] + smallS[i][j];
-			else smallDt[i][j] = max(smallDt[i-1][j], smallDt[i][j-1]) + smallS[i][j];
+//    for(int i=0; i<array_End.r+1; i++) // Weight calculation about small array.
+// 	{
+// 		for(int j=0; j<array_End.c+1; j++)
+// 			{
+// 			if(i==0 && j==0) smallDt[i][j] = smallS[i][j];
+// 			else if(i==0) smallDt[i][j] = smallDt[i][j-1] + smallS[i][j];
+// 			else if(j==0) smallDt[i][j] = smallDt[i-1][j] + smallS[i][j];
+// 			else smallDt[i][j] = max(smallDt[i-1][j], smallDt[i][j-1]) + smallS[i][j];
+// 			}
+// 	}
+//    if (smallDt[array_End.r][array_End.c] > 0)
+//    {
+//       return smallDt; // return an array of weights to go from (start point) to (end point)
+//    }
+//    else if(smallDt[array_End.r][array_End.c] == 0)
+//    {
+//       // 보류
+//    }
+//    {
+//       return 0; // False. Don't visit this redPatch
+//    }
+// }
+
+int weight_array[5][5];
+void weight(Point start, Point end){
+	bell_ford(start, end, weight_array);
+	// find weight / use lecture reference
+	if (end.r - start.r <= 0 && end.c - start.c <= 0) {// left, up{}
+		for (int i = start.r; i >= end.r; i--){
+			for (int j = start.c; j >= end.c; j--){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j+1]) + colorMapping[i][j];
 			}
+		}
+	} 
+
+	else if (end.r - start.r >= 0 && end.c - start.c <= 0) {// left, down 
+		for (int i = start.r; i <= end.r; i++){
+			for (int j = start.c; j >= end.c; j--){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j+1]) + colorMapping[i][j];
+			}
+		}
+	}
+	else {// right, up
+		for (int i = start.r; i >= end.r; i--){
+			for (int j = start.c; j <= end.c; j++){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j-1]) + colorMapping[i][j];
+			}
+		}
 	}
 
-   return smallDt; // return an array of weights to go from (start point) to (end point)
+	if (weight_array[end.r][end.c] > 0)
+   {
+      return weight_array; // return an array of weights to go from (start point) to (end point)
+   }
+   else if(weight_array[end.r][end.c] == 0)
+   {
+      return;
+   }
+   else
+   {
+      return 0; // False. Don't visit this redPatch
+      // if(weight() != 0){}
+   }
 }
 
 void gotoNextRedpatch(int dt[6][6], Point start_p, Point end_p)
@@ -158,7 +255,14 @@ void gotoNextRedpatch(int dt[6][6], Point start_p, Point end_p)
 
    while(start_r != end_r && start_c != end_c)
 	{
-      if(start_r > 1)
+      if(start_r > end_r && start_c > end_c) // move (left)+(up)
+      {
+         if(start_r==0) goLeft(); // row is 0.
+         else if(start_c==0) goUp(); // col is o.
+         else if(dt[start_r-1][start_c] > dt[start_r][start_c-1]) goLeft(); // Left is bigger than Up
+         else if(dt[start_r-1][start_c] < dt[start_r][start_c-1]) goUp(); // Up is bigger than Left
+         else goLeft();// if Left, Up is same?????
+      }
 		if(r==0) goRight();
 		else if(dt[r-1][c] > dt[r][c-1]) goUp(); // Up_value is bigger than Left_value
 		// else if(dt[r-1][c] == dt[r][c-1]) // Up/Left_value is same
@@ -191,6 +295,8 @@ task main()
    //redPoint location store.
    findShortestDistance();
    ff();
+
+   while()
 
 
 
