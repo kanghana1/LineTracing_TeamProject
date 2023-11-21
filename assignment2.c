@@ -1,13 +1,12 @@
 #define MAX_POINTS 100 // max points
 #define MAX_DISTANCE 1000000000 // max distance
 #define INF 987654321
-#include <stdio.h>
-#include <stdbool.h>
+
 //colorMapping must be a global variable
 /*explanation function & variables
 1. point = the location of point(x, y)
 2. calculate = calcualte the distance of point1 and point2. return distance.
-			 = it will help comparing the distance of red patches and current location. 
+= it will help comparing the distance of red patches and current location. 
 3. findshortestDistance = to find the shortest distance among redponits. 
 						its parameters are 1) current location x, y 2) red patches location x, y 3) the number of red patches.
 4. first current poisition will be (4, 4)
@@ -54,7 +53,7 @@ bool isPointZero(Point point){
 	return (point.r == 0 && point.c == 0);
 }
 
-
+/*
 void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
 	for (int i = 0; i< 5; i++){
 		for (int j = 0; j < 5; j++){
@@ -80,7 +79,8 @@ void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ??
 	}
 
 	return array;
-}
+} */
+
 // 과연 그 부분만 배열을 따오는 함수가 필요한가? 필요함. 무조건 0. 
 int weight_array[5][5];
 void weight(Point start, Point end){
@@ -96,18 +96,6 @@ void weight(Point start, Point end){
 			}
 		}
 	}
-
-	else if (end.r - start.r >= 0 && end.c - start.c >= 0){ //right, down
-		for (int i = start.r; i <= end.r; i++){
-			for (int j = start.r; j <= end.r; j++){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j-1]) + colorMapping[i][j];
-			}
-		}
-	} 
-
 	else if (end.r - start.r >= 0 && end.c - start.c <= 0) {// left, down 
 		for (int i = start.r; i <= end.r; i++){
 			for (int j = start.c; j >= end.c; j--){
@@ -138,11 +126,11 @@ task main()
 	Point redPoint[MAX_POINTS];
 	int redPointCount = 0; //add points
 	int r, g, b;
-	if (getcolorRGB(r, g, b) == 2) {score++;} // add to LineTracing.c
+	if (getcolorRGB(r, g, b) == 1) {score++;} // add to LineTracing.c
 
 	for (int i = 0; i < 5; i++){
 		for (int j = 0; j < 5; j++){
-			if (colorMapping[i][j] == 2){ // if red;
+			if (colorMapping[i][j] == 1){ // if red;
 				redPoint[redPointCount].x = i;
 				redPoint[redPointCount].y = j;
 				redPointCount++;}

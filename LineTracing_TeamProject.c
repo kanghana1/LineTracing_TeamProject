@@ -182,7 +182,7 @@ void moveRobot() {
                   }
 
             }
-            if (y % 2 == 0 && (x)) { 
+            if (y % 2 == 0) { 
                   turnRight();
                   while(getColorRight() == WHITE_COLOR){
                         tracing();
