@@ -22,6 +22,7 @@
 1. When robot go to first red patch, drop the that red patch in redpoint[], and redcount--;*/
 
 
+
 typedef struct Point {
 	int r;
 	int c;
@@ -57,7 +58,7 @@ bool isPointZero(Point point){
 void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
 	for (int i = 0; i< 5; i++){
 		for (int j = 0; j < 5; j++){
-			array[i][j] = INF; // give initial values 
+			array[i][j] = 0; // give initial values 
 		}
 	}
 
@@ -80,15 +81,58 @@ void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ??
 
 	return array;
 }
-
+// 과연 그 부분만 배열을 따오는 함수가 필요한가? 필요함. 무조건 0. 
+int weight_array[5][5];
 void weight(Point start, Point end){
-	int weight_array[5][5];
-
 	bell_ford(start, end, weight_array);
 	// find weight / use lecture reference
-	 
+	if (end.r - start.r <= 0 && end.c - start.c <= 0) {// left, up{}
+		for (int i = start.r; i >= end.r; i--){
+			for (int j = start.c; j >= end.c; j--){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j+1]) + colorMapping[i][j];
+			}
+		}
+	}
 
+	else if (end.r - start.r >= 0 && end.c - start.c >= 0){ //right, down
+		for (int i = start.r; i <= end.r; i++){
+			for (int j = start.r; j <= end.r; j++){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j-1]) + colorMapping[i][j];
+			}
+		}
+	} 
+
+	else if (end.r - start.r >= 0 && end.c - start.c <= 0) {// left, down 
+		for (int i = start.r; i <= end.r; i++){
+			for (int j = start.c; j >= end.c; j--){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j+1]) + colorMapping[i][j];
+			}
+		}
+	}
+	else {// right, up
+		for (int i = start.r; i >= end.r; i--){
+			for (int j = start.c; j <= end.c; j++){
+				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
+				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
+				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
+				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j-1]) + colorMapping[i][j];
+			}
+		}
+	}
+
+	return weight_array;
 }
+
+int row, rr, cc, col; 
 task main()
 {
 	Point redPoint[MAX_POINTS];
@@ -107,7 +151,15 @@ task main()
 
 	//redPoint location store.
 	Point togo = findShortestDistance(currentPosition, redPoint, redPointCount); // first
-	bell_ford(currentPosition, togo);
+	weight(currentPosition, togo);
+	
+	row = currentPosition.r;
+	col = currentPosition.c;
+	rr = togo.r;
+	cc = togo.c;
+	while (rr != row || cc != col){
+		if (rr == currentPosition.r)
+	}
 	
 
 
