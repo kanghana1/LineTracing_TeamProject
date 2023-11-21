@@ -167,6 +167,7 @@ void moveRobot() {
                         sleep(500);
                         x++;
                         colorMapping[y][x] = getColorFront();
+                        displayBigTextLine(1,"%d, %d",y,x);
                         if (x == 4) break;
                         go(speed); // 재측정 방지로 500ms동안 밀어주기
                         sleep(500);
@@ -174,14 +175,14 @@ void moveRobot() {
                   else if ((getColorLeft() == YELLOW_COLOR || getColorRight() == YELLOW_COLOR) && y % 2 == 1) {
                         x--;
                         colorMapping[y][x] = getColorFront();
+                        displayBigTextLine(1,"%d, %d",y,x);
                         if (x == 0) break;
                         go(speed); // 재측정 방지로 500ms동안 밀어주기
                         sleep(500);
                   }
-                  displayBigTextLine(1,"%d, %d",y,x);
 
             }
-            if (y % 2 == 0) { 
+            if (y % 2 == 0 && (x)) { 
                   turnRight();
                   while(getColorRight() == WHITE_COLOR){
                         tracing();
