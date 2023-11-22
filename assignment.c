@@ -70,7 +70,7 @@ void bell_ford(int grid, Point start, Point end){
 // This method calculates the weight from the current location to the red patch located
 //  at the shortest distance to helps the robot achieve optimal movement.
 
-int findDt(Point start, Point end, int arr[6][6])
+int findDt(Point start, Point end, int arr[6][6]) // red에서 다른 red 갈 때 가중치 구함
 { // !! S: information about the patch, Dt: information about weights.
 
 /* you don't need to look at this comments
@@ -112,7 +112,7 @@ int findDt(Point start, Point end, int arr[6][6])
    // }
 */
 
-   int Small_r, Small_c, Large_r, Large_c;
+   int Small_r, Small_c, Large_r, Large_c; 
    
    Small_r, Small_c = minPoint(start, end);
    Large_r, Large_c = maxPoint(start, end);
@@ -123,7 +123,7 @@ int findDt(Point start, Point end, int arr[6][6])
    int size_r = abs(start.r - end.r) + 1; // array r_size
    int size_c = abs(start.c - end.c) + 1; // array c_size
 
-   int smallDt[size_r][size_c]; // define small_array of Dt
+   int smallDt[size_r][size_c]; // define small_array of Dt 가중치
    int smallS[size_r][size_c]; // define small_array of S
 
    for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS

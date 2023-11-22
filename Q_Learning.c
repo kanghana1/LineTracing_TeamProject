@@ -2,6 +2,8 @@
 #define MAX_DISTANCE 1000000000 // max distance
 #define INF 987654321
 
+Point redPoint[MAX_POINTS];
+ int redPointCount = 0; //add points
 //colorMapping must be a global variable
 /*explanation function & variables
 1. point = the location of point(x, y)
@@ -26,16 +28,22 @@ typedef struct Point {
 	int r;
 	int c;
 } Point;
+
 Point currentPosition = {4, 4}; // start point. 
+
 int score = 0; // the number of red patches that robot gets.
 
+ 
+
+
+/*
 float Calculate(Point point1, Point point2){ //calculate the distance of point1 and point2. 
 	return abs((point1.r + point1.c) - (point2.r + point2.c));
 }
 
 Point findShortestDistance(Point currentPosition, Point redPoint[], int redPointCount){ // send redPoint array. compare each elements
 	float shortestDistance = MAX_DISTANCE;
-	Point shortest_redPatch;
+	Point shortest_redPatch; // 최단거리 레드패치의 좌표
 
 	for (int i = 0; i < redPointCount; i++){
 		float distance = Calculate(currentPosition, redPoint[i]);
@@ -53,7 +61,7 @@ bool isPointZero(Point point){
 	return (point.r == 0 && point.c == 0);
 }
 
-/*
+
 void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
 	for (int i = 0; i< 5; i++){
 		for (int j = 0; j < 5; j++){
@@ -79,11 +87,11 @@ void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ??
 	}
 
 	return array;
-} */
+} 
 
 // 과연 그 부분만 배열을 따오는 함수가 필요한가? 필요함. 무조건 0. 
-int weight_array[5][5];
-void weight(Point start, Point end){
+int weight_array[5][5]; // !!!!! 전역변수면 bell_ford의 인자로 넣을 필요가 있을까 ?
+int** weight(Point start, Point end){ // !!!!! start ~ end 2차원배열 반환
 	bell_ford(start, end, weight_array);
 	// find weight / use lecture reference
 	if (end.r - start.r <= 0 && end.c - start.c <= 0) {// left, up{}
@@ -120,16 +128,11 @@ void weight(Point start, Point end){
 	return weight_array;
 }
 
-
+*/
 
 int row, rr, cc, col; 
 task main()
 {
-	Point redPoint[MAX_POINTS];
-	int redPointCount = 0; //add points
-	int r, g, b;
-	if (getcolorRGB(r, g, b) == 1) {score++;} // add to LineTracing.c
-
 	for (int i = 0; i < 5; i++){
 		for (int j = 0; j < 5; j++){
 			if (colorMapping[i][j] == 1){ // if red;
