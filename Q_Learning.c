@@ -3,7 +3,8 @@
 #define INF 987654321
 
 Point redPoint[MAX_POINTS];
- int redPointCount = 0; //add points
+int redPointCount = 0; //add points
+float QMap[5][5];
 //colorMapping must be a global variable
 /*explanation function & variables
 1. point = the location of point(x, y)
@@ -33,102 +34,54 @@ Point currentPosition = {4, 4}; // start point.
 
 int score = 0; // the number of red patches that robot gets.
 
- 
+float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
+	int r, c;
+	int Qmap[5][5]; // 큐맵 중 한 개
+	
 
-
-/*
-float Calculate(Point point1, Point point2){ //calculate the distance of point1 and point2. 
-	return abs((point1.r + point1.c) - (point2.r + point2.c));
-}
-
-Point findShortestDistance(Point currentPosition, Point redPoint[], int redPointCount){ // send redPoint array. compare each elements
-	float shortestDistance = MAX_DISTANCE;
-	Point shortest_redPatch; // 최단거리 레드패치의 좌표
-
-	for (int i = 0; i < redPointCount; i++){
-		float distance = Calculate(currentPosition, redPoint[i]);
-		if (distance < shortestDistance) {
-			shortestDistance = distance;
-			shortest_redPatch.r = redPoint[i].r;
-			shortest_redPatch.c = redPoint[i].c;
+	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
+		for (int j = 0 ; j < 5 ; j++) {
+			if (colorMapping[i][j] == -1) QMap[i][j] = -1; 
+			else QMap[i][j] = 0;
 		}
 	}
+	Qmap[p1.r][p1.c] = 1; // 레드포인트 한 개만 넣기
 
-	return shortest_redPatch; // it returns shortest_redPatch location x, y
-}
-
-bool isPointZero(Point point){
-	return (point.r == 0 && point.c == 0);
-}
-
-
-void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
-	for (int i = 0; i< 5; i++){
-		for (int j = 0; j < 5; j++){
-			array[i][j] = 0; // give initial values 
-		}
-	}
-
-	int offset_r, offset_c, limit_r, limit_c;
-
-	if (start.r > end.r){limit_r = start.r; offset_r = end.r;}
-	else{limit_r = end.r; offset_r = start.r;}
-
-	if (start.c > end.c){limit_c = start.c; offset_c = end.c;}
-	else{limit_c = end.c; offset_c = start.c;}
-	// to copy array 
-
-
-	// copy array 
-	for (int r = offset_r; r <= limit_r; r++){
-		for (int c = offset_c; c <= limit_c; c++){
-			array[r][c] = colorMapping[r][c];
-		}
-	}
-
-	return array;
-} 
-
-// 과연 그 부분만 배열을 따오는 함수가 필요한가? 필요함. 무조건 0. 
-int weight_array[5][5]; // !!!!! 전역변수면 bell_ford의 인자로 넣을 필요가 있을까 ?
-int** weight(Point start, Point end){ // !!!!! start ~ end 2차원배열 반환
-	bell_ford(start, end, weight_array);
-	// find weight / use lecture reference
-	if (end.r - start.r <= 0 && end.c - start.c <= 0) {// left, up{}
-		for (int i = start.r; i >= end.r; i--){
-			for (int j = start.c; j >= end.c; j--){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j+1]) + colorMapping[i][j];
+	for (int i = 0 ; i < 5 ; i++) {
+		for (int j = 0 ; j < 5 ; j++) {
+			if (QMap[i][j] == 0) { 
+				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
+					QMap[i][j] = 0.9;
+					cnt++;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 2) {
+					QMap[i][j] = 0.72;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 3) {
+					QMap[i][j] = 0.5;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 4) {
+					QMap[i][j] = 0.3;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 5) {
+					QMap[i][j] = 0.15;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 6) {
+					QMap[i][j] = 0.06;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
+					QMap[i][j] = 0.02;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
+					QMap[i][j] = 0.004;
+				}
 			}
 		}
 	}
-	else if (end.r - start.r >= 0 && end.c - start.c <= 0) {// left, down 
-		for (int i = start.r; i <= end.r; i++){
-			for (int j = start.c; j >= end.c; j--){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j+1]) + colorMapping[i][j];
-			}
-		}
-	}
-	else {// right, up
-		for (int i = start.r; i >= end.r; i--){
-			for (int j = start.c; j <= end.c; j++){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j-1]) + colorMapping[i][j];
-			}
-		}
-	}
-
-	return weight_array;
+	return QMap;
 }
 
-*/
+
 
 int row, rr, cc, col; 
 task main()
