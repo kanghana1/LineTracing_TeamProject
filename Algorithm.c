@@ -22,8 +22,9 @@ Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘�
 int redCount = 0;
 int Qmap[5][5];
 int colorMapping[5][5]; // 본래맵
-int redPatchMap[5][5]; // 레드패치맵
+// int redPatchMap[5][5]; // 레드패치맵
 
+/*
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
 }
@@ -69,16 +70,16 @@ Point findShortestDistance(Point currentPosition, Point redPoint[], int redPoint
 
 	return shortest_redPatch; // it returns shortest_redPatch location x, y
 }
-
+*/
 
 bool isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
 
-int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
-    return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
-           (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
-}
+// int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
+//     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
+//            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
+// }
 
 float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 	float QMap[5][5]; // 큐맵 중 한 개
@@ -393,7 +394,7 @@ task main()
       sumQmap(redPatch[i]);
    }
 
-
+/*
    while(currentPoint.r != 0 && currentPoint.c != 0)
    {
       if(redCount == 0) // 레드패치수가 0개면
@@ -428,6 +429,7 @@ task main()
          }
       }
    }
+*/
 // 나 울고싶어 얘들아 ㅎㅎ 이 코드 망했어욘 ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ
 
    
@@ -435,7 +437,4 @@ task main()
    ff();
 
    
-
-
-
 }
