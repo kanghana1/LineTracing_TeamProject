@@ -9,244 +9,192 @@
 #define MAX_POINTS 100 // max points
 #define MAX_DISTANCE 1000000000 // max distance
 #define INF 987654321
-int top=-1;
+
 
 typedef struct Point {
    int r;
    int c;
 } Point;
 
-int IsEmpty(){
-    if(top<0)
-        return true;
-    else
-        return false;
-    }
-int IsFull(){
-    if(top>=MAX_STACK_SIZE-1)
-        return true;
-    else
-        return false;
-}
- 
-void push(int value){
-    if(IsFull()==true)
-        printf("스택이 가득 찼습니다.");
-    else
-        stack[++top]=value; 
-}
- 
-int pop(){
-    if(IsEmpty()==true)
-        printf("스택이 비었습니다.");
-    else 
-        return stack[top--];
-}
+Point currentPoint = {0, 0}; // 현재 위치
+Point FinishPoint = {0, 0};
+Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
+int redCount = 0;
+int colorMapping[5][5]; // 본래맵
+int redPatchMap[5][5]; // 레드패치맵
 
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
 }
 
-int minPoint(Point point1, Point point2) // using in findDt method
+int min(int a, int b)
 {
-   return min(point1.r, point2.r), min(point1.c, point2.c);
+   return a < b ? a : b;
 }
 
-int maxPoint(Point point1, Point point2) // using in findDt method
+
+int max(int a, int b)
 {
-   return max(point1.r, point2.r), max(point1.c, point2.c);
+   return a > b ? a : b;
 }
 
-float findShortestDistance(Point currentPosition, Point redPoint, int redPointCount){ // shortdistance from current to nextred
-   float shortestDistance = MAX_DISTANCE;
+Point minPoint(Point point1, Point point2) {
+   Point result;
+   result.r = min(point1.r, point2.r);
+   result.c = min(point1.c, point2.c);
+   return result;
+}
 
-   for (int i = 0; i < redPointCount; i++){ // what is redPointCount?
-      float distance = Calculate(currentPosition, redPoint); // caculating distance from current to redPoint
-      if (distance < shortestDistance) { // if on this distance is shorter than shortdistance
-         shortestDistance = distance; // change shorterdistance
-      }
-   }
-
-   return shortestDistance; // fix!!
+Point maxPoint(Point point1, Point point2) {
+   Point result;
+   result.r = max(point1.r, point2.r);
+   result.c = max(point1.c, point2.c);
+   return result;
 }
 
 
-Point currentPosition = {0, 0};
+Point findShortestDistance(Point currentPosition, Point redPoint[], int redPointCount){ // send redPoint array. compare each elements
+	float shortestDistance = MAX_DISTANCE;
+	Point shortest_redPatch;
+
+	for (int i = 0; i < redPointCount; i++){
+		float distance = Calculate(currentPosition, redPoint[i]);
+		if (distance <= shortestDistance) {
+			shortestDistance = distance;
+			shortest_redPatch.r = redPoint[i].r;
+			shortest_redPatch.c = redPoint[i].c;
+		}
+	}
+
+	return shortest_redPatch; // it returns shortest_redPatch location x, y
+}
+
+
 bool isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
 
-void bell_ford(Point start, Point end, int array[5][5]){ // Pointer memory ? ?? 
-	for (int i = 0; i< 5; i++){
-		for (int j = 0; j < 5; j++){
-			array[i][j] = 0; // give initial values 
-		}
-	}
-
-	int offset_r, offset_c, limit_r, limit_c;
-
-	if (start.r > end.r){limit_r = start.r; offset_r = end.r;}
-	else{limit_r = end.r; offset_r = start.r;}
-
-	if (start.c > end.c){limit_c = start.c; offset_c = end.c;}
-	else{limit_c = end.c; offset_c = start.c;}
-	// to copy array 
 
 
-	// copy array 
-	for (int r = offset_r; r <= limit_r; r++){
-		for (int c = offset_c; c <= limit_c; c++){
-			array[r][c] = colorMapping[r][c];
-		}
-	}
+// This method calculates the weight from the current location to the red patch located
+//  at the shortest distance to helps the robot achieve optimal movement.
 
-	return array;
-}
+int findDt(Point start, Point end, int arr[5][5])
+{ // !! S: information about the patch, Dt: information about weights.
 
-
-// // This method calculates the weight from the current location to the red patch located
-// //  at the shortest distance to helps the robot achieve optimal movement.
-
-// int findDt(Point start, Point end, int arr[6][6])
-// { // !! S: information about the patch, Dt: information about weights.
-
-// /* you don't need to look at this comments
-//    // int start_r, start_c, end_r, end_c; // redefine Pointing spot.
-
-//    // for(int i=0; i<6; i++) // define INF array
-//    // {
-//    //    for(int j=0; j<6; j++)
-//    //    {
-//    //       smallDt[i][j] = INF;
-//    //    }
-//    // }
-
-
-//    // if (start.r>end.r && start.c>end.c) // redefine startingPoint, endingPoint
-//    // {
-//    //    start_r = start.r;
-//    //    end_r = end.r;
-//    //    start_c = start.c;
-//    //    end_c = end.c;
-//    // }
-//    // else if(start.r<end.r && start.c<end.c)
-//    // {
-//    //    start_r = end.r;
-//    //    end_r = start.r;
-//    //    start_c = end.c;
-//    //    end_c = start.c;
-//    // }
-
-//    // if (start.c>end.c)
-//    // {  
-//    //    start_c = start.c;
-//    //    end_c = end.c;
-//    // }
-//    // else
-//    // {
-//    //    start_c = end.c;
-//    //    end_c = end.c;
-//    // }
-// */
-
-//    int Small_r, Small_c, Large_r, Large_c;
+   Point Small, Large;
+   int Small_r, Small_c, Large_r, Large_c;
    
-//    Small_r, Small_c = minPoint(start, end);
-//    Large_r, Large_c = maxPoint(start, end);
+   Small = minPoint(start, end); // (자른 배열의 시작지점 구하기)
+   Large = maxPoint(start, end); // (자른 배열의 끝지점 구하기)
 
-//    Point array_Start = {Small_r, Small_c}; // start point of the original array
-//    Point array_End = {Large_r, Large_c}; // end point of the original array
+   Small_r = Small.r;
+   Small_c = Small.c;
+   Large_r = Large.r;
+   Large_c = Large.c;
 
-//    int size_r = abs(start.r - end.r) + 1; // array r_size
-//    int size_c = abs(start.c - end.c) + 1; // array c_size
+   Point array_Start = {Small_r, Small_c}; // start point of the original array (본래 배열의 시작지점)
+   Point array_End = {Large_r, Large_c}; // end point of the original array (본래 배열의 끝지점)
 
-//    int smallDt[size_r][size_c]; // define small_array of Dt
-//    int smallS[size_r][size_c]; // define small_array of S
+   int size_r = abs(start.r - end.r) + 1; // array r_size (자른 배열의 r사이즈)
+   int size_c = abs(start.c - end.c) + 1; // array c_size (자른 배열의 c사이즈)
 
-//    for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS
-//    {
-//       for (int j = 0; j < size_c; j++)
-//       {
-//          smallS[i][j] = arr[array_Start.r + i][array_Start.c + j]; // !!! why arr is error? because of fucking pointer!?
-//       }
-//    }
+   int smallDt[size_r][size_c]; // define small_array of Dt (가중치 배열인 Dt 선언)
+   int smallS[size_r][size_c]; // define small_array of S (패치의 위치 배열인 S 선언)
 
-
-//    for(int i=0; i<array_End.r+1; i++) // Weight calculation about small array.
-// 	{
-// 		for(int j=0; j<array_End.c+1; j++)
-// 			{
-// 			if(i==0 && j==0) smallDt[i][j] = smallS[i][j];
-// 			else if(i==0) smallDt[i][j] = smallDt[i][j-1] + smallS[i][j];
-// 			else if(j==0) smallDt[i][j] = smallDt[i-1][j] + smallS[i][j];
-// 			else smallDt[i][j] = max(smallDt[i-1][j], smallDt[i][j-1]) + smallS[i][j];
-// 			}
-// 	}
-//    if (smallDt[array_End.r][array_End.c] > 0)
-//    {
-//       return smallDt; // return an array of weights to go from (start point) to (end point)
-//    }
-//    else if(smallDt[array_End.r][array_End.c] == 0)
-//    {
-//       // 보류
-//    }
-//    {
-//       return 0; // False. Don't visit this redPatch
-//    }
-// }
-
-int weight_array[5][5];
-void weight(Point start, Point end){
-	bell_ford(start, end, weight_array);
-	// find weight / use lecture reference
-	if (end.r - start.r <= 0 && end.c - start.c <= 0) {// left, up{}
-		for (int i = start.r; i >= end.r; i--){
-			for (int j = start.c; j >= end.c; j--){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j+1]) + colorMapping[i][j];
-			}
-		}
-	} 
-
-	else if (end.r - start.r >= 0 && end.c - start.c <= 0) {// left, down 
-		for (int i = start.r; i <= end.r; i++){
-			for (int j = start.c; j >= end.c; j--){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j+1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i-1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i-1][j], weight_array[i][j+1]) + colorMapping[i][j];
-			}
-		}
-	}
-	else {// right, up
-		for (int i = start.r; i >= end.r; i--){
-			for (int j = start.c; j <= end.c; j++){
-				if (i == start.r && j == start.c) weight_array[i][j] = colorMapping[i][j];
-				else if (i == start.r) weight_array[i][j] = weight_array[i][j-1] + colorMapping[i][j];
-				else if (j == start.c) weight_array[i][j] = weight_array[i+1][j] + colorMapping[i][j];
-				else weight_array[i][j] = max(weight_array[i+1][j], weight_array[i][j-1]) + colorMapping[i][j];
-			}
-		}
-	}
-
-	if (weight_array[end.r][end.c] > 0)
-   {
-      return weight_array; // return an array of weights to go from (start point) to (end point)
+   for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS
+   {                                // (smallS에다가 자른 배열만큼에 해당하는 본래의 패치 정보를 불러옴)
+      for (int j = 0; j < size_c; j++)
+      {
+         smallS[i][j] = arr[array_Start.r + i][array_Start.c + j]; // 본래의 배열에서 시작지점부터 불러옴
+      }
    }
-   else if(weight_array[end.r][end.c] == 0)
+
+
+   if(start.r > end.r && start.c > end.c) // direction Left and Up (왼쪽, 위 이동할때의 가중치계산)
    {
-      return;
+      for(int i=start.r; i>=end.r; i--) // Weight calculation about small array.
+	   {
+		   for(int j=start.c; j>=end.c; j--)
+			   {
+			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
+			   else if(i==start.r) smallDt[i][j] = smallDt[i][j+1] + smallS[i][j]; // 왼쪽 방향 가중치
+			   else if(j==start.c) smallDt[i][j] = smallDt[i+1][j] + smallS[i][j]; // 위쪽방향 가중치
+			   else smallDt[i][j] = max(smallDt[i+1][j], smallDt[i][j+1]) + smallS[i][j];
+		   	}
+	   }
+   }
+   else if(start.r > end.r) // direction Up and... (위쪽으로 이동할 건데..)
+   {
+      if(start.c < end.c) // direction Up and Right (오른쪽으로도 갈 때의 가중치 계산)
+      {
+         for(int i=start.r; i>=end.r; i--)
+	      {
+		      for(int j=start.c; j<=end.c; j++)
+			      {
+			      if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
+			      else if(i==start.r) smallDt[i][j] = smallDt[i][j-1] + smallS[i][j]; // 오른쪽 방향 가중치
+			      else if(j==start.c) smallDt[i][j] = smallDt[i+1][j] + smallS[i][j]; // 위쪽 방향 가중치
+			      else smallDt[i][j] = max(smallDt[i+1][j], smallDt[i][j-1]) + smallS[i][j];
+		   	   }
+	      }
+      }
+      else // start.c==end.c. because of (start.r > end.r) is included Left and Up. direction Up.
+      {    // (이건 무조건 start.c==end.c. (start.c > end.c)는 이미 위 if문에 (왼쪽, 위) 이동에 포함되어있기 때문. 위쪽으로만의 가중치 계산)
+         for(int i=start.r; i>=end.r; i--)
+	      {
+		      for(int j=start.c; j<=end.c; j--)
+			      {
+			      if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
+			      else smallDt[i][j] = smallDt[i+1][j] + smallS[i][j];
+		   	   }
+	      }
+      }
+   }
+   else if(start.r < end.r) // direction down and Left (아래로 가면서 왼쪽으로 갈 때의 가중치 계산)
+   {                        // 오른쪽만 가거나, 아래만 가거나, (오른쪽, 아래)로 가는 경우의 수는 존재할 수 없다.
+      for(int i=start.r; i<=end.r; i++) // Weight calculation about small array.
+	   {
+		   for(int j=start.c; j>=end.c; j--)
+			   {
+			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
+			   else if(i==start.r) smallDt[i][j] = smallDt[i][j+1] + smallS[i][j]; // 왼쪽 방향 가중치
+			   else if(j==start.c) smallDt[i][j] = smallDt[i-1][j] + smallS[i][j]; // 아래쪽 방향 가중치
+			   else smallDt[i][j] = max(smallDt[i-1][j], smallDt[i][j+1]) + smallS[i][j];
+		   	}
+	   }
+   }
+   else // start.r == end.r direction Left (왼쪽으로만 갈 때의 가중치 계산)
+   {
+      for(int i=start.r; i>=end.r; i--) // Weight calculation about small array.
+	   {
+		   for(int j=start.c; j>=end.c; j--)
+			   {
+			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
+			   else smallDt[i][j] = smallDt[i][j+1] + smallS[i][j];
+		   	}
+	   }
+   }
+
+
+   if (smallDt[end.r][end.c] > 0) // (도착지점의 가중치가 양수면 배열 반환)
+   {
+      return smallDt; // return an array of weights to go from (start point) to (end point)
+   }
+   else if(smallDt[end.r][end.c] == 0)
+   {
+      return 1; // 1인 이유는 main에서 설명
    }
    else
    {
       return 0; // False. Don't visit this redPatch
-      // if(weight() != 0){}
    }
 }
 
-void gotoNextRedpatch(int dt[6][6], Point start_p, Point end_p)
+
+
+
+void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
 {
    int start_r = start_p.r;
    int start_c = start_p.c;
@@ -257,46 +205,160 @@ void gotoNextRedpatch(int dt[6][6], Point start_p, Point end_p)
 	{
       if(start_r > end_r && start_c > end_c) // move (left)+(up)
       {
-         if(start_r==0) goLeft(); // row is 0.
-         else if(start_c==0) goUp(); // col is o.
-         else if(dt[start_r-1][start_c] > dt[start_r][start_c-1]) goLeft(); // Left is bigger than Up
-         else if(dt[start_r-1][start_c] < dt[start_r][start_c-1]) goUp(); // Up is bigger than Left
-         else goLeft();// if Left, Up is same?????
+         if(dt[start_r-1][start_c] > dt[start_r][start_c-1]) // Left is bigger than Up
+         {
+            start_c -= 1; // goLeft
+            // 왼쪽으로 이동하는 함수 부르기
+         }
+         else if(dt[start_r-1][start_c] < dt[start_r][start_c-1]) // Up is bigger than Left
+         {
+            start_r -= 1; // goUp
+            // 위쪽으로 이동하는 함수 부르기
+         }
+         else // if (Left, Up) is same?????
+         {
+            start_c -= 1; // goLeft
+            // 왼쪽으로 이동하는 함수 부르기
+         }
       }
-		if(r==0) goRight();
-		else if(dt[r-1][c] > dt[r][c-1]) goUp(); // Up_value is bigger than Left_value
-		// else if(dt[r-1][c] == dt[r][c-1]) // Up/Left_value is same
-		// {
-		// 	int a = cases(r-1, c, dt[r-1][c]); // S_Up_dt_time
-		// 	int b = cases(r, c-1, dt[r][c-1]); // S_Left_time
-		// 	if(a > b) goLeft(); // S_Up_time is long, goL
-		// 	else goUp(); // S-Left_time is long, goU
-		// }
-      else if(dt[r][c+1] > dt[r][c]) goRight();
-		else goRight(); // Left_value is bigger than Up_value hmm,,, fuck?? oh that's ok.
+		else if(start_r > end_r) // move Up... 위쪽으로 갈 건데...
+      {
+         if(start_c < end_c) // 오른쪽으로 가야하면
+         {
+            if(dt[start_r-1][start_c] < dt[start_r][start_c+1]) // 오른쪽 이동
+            {
+               start_c += 1; // goRight
+               // 오른쪽으로 이동하는 함수 부르기
+            }
+            else if(dt[start_r-1][start_c] > dt[start_r][start_c+1]) // 위쪽 이동
+            {
+               start_r -= 1; // goUp
+               // 위쪽으로 이동하는 함수 부르기
+            }
+            else
+            {
+               start_c += 1; // goRight
+               // 오른쪽으로 이동하는 함수 부르기
+            }
+         }
+         else
+         {
+            start_r -= 1; // goUp
+         }
+      }
+      else if(start_r < end_r) // 왼쪽 아래로
+      {
+         if(dt[start_r-1][start_c] > dt[start_r][start_c-1])
+         {
+            start_c -= 1; // goLeft
+            // 왼쪽으로 이동하는 함수 부르기
+         }
+         else if(dt[start_r-1][start_c] < dt[start_r][start_c+1])
+         {
+            start_r += 1; // goRight
+            // 오른쪽으로 이동하는 함수 부르기
+         }
+      }
+      else // 왼쪽으로만
+      {
+         start_c -= 1;
+         // 왼쪽으로 이동하는 함수 부르기
+      }
+
 		eraseDisplay();
 
 	}
 }
 
-task main()
+Point RightUpredPatch() // 맨오른쪽아래 빨간점 위치 반환
 {
-   Point redPoint[MAX_POINTS];
-   int redPointCount = 0; //add points // is this the number of redPoint?
-
-   for (int i = 0; i < 5; i++){ // oh, is this mapping of redPoint?
-      for (int j = 0; j < 5; j++){
-         if (colorMapping[i][j] == 1){ // if red. oh, 2 is red?
-            redPoint[redPointCount].r = i;
-            redPoint[redPointCount].c = j;
-            redPointCount++;}
+   Point redlast = {-1, -1};
+   for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+         if (redPatchMap[i][j] == 1) { // 마지막 빨간점의 인덱스 찾기
+            redlast.r = i;
+            redlast.c = j;
+         }
       }
    }
+   return redlast;
+}
+
+int redisIn()
+{
+   int cnt = 0;
+   for(int i=0; i<5; i++)
+   {
+      for(int j=0; j<5; j++)
+      {
+         if(colorMapping[i][j] == 1)
+         {
+            cnt += 1;
+         }
+      }
+   }
+   return cnt;
+}
+
+task main()
+{
+   int mapsize_r = 0, mapsize_c = 0;
+   int k = 0;
+   Point redPatch[redCount];
+
+   for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+         if (colorMapping[i][j] == 1) { // 컬러맵에서 1이 있으면 그 위치에 똑같이 레드패치맵에 1넣기
+            redPatchMap[i][j] = 1;
+            redPatch[k].r = i;
+            redPatch[k].c = j;
+            k += 1;
+         }
+      }
+   }
+
+
+   while(currentPoint.r != 0 && currentPoint.c != 0)
+   {
+      if(redCount == 0) // 레드패치수가 0개면
+      {
+         mapsize_r = abs(currentPoint.r- FinishPoint.r) + 1;
+         mapsize_c = abs(currentPoint.c- FinishPoint.c) + 1;
+         int arr[mapsize_r][mapsize_c] = findDt(currentPoint, FinishPoint, colorMapping); // 오류 안 나나??
+         gotoNextRedpatch(arr, currentPoint, FinishPoint);
+      }
+      else if(redCount > 0) // 레드패치수가 0보다 크면
+      {
+         redPoint = findShortestDistance(currentPoint, redPatch, redCount); // 다음 레드패치 위치 구하기
+         if (redisIn() == 0) // 만약 패치수는 많은데, 맵에 1이 없다면?
+         {
+            Point RightUpredPoint = RightUpredPatch(); // 맨오른쪽아래 레드패치지점
+         }
+         else if(findDt(currentPoint, redPoint, colorMapping) == 0) // 반환값이 0이면(가중치가 음수)
+         {
+            colorMapping[redPoint.r][redPoint.c] = -1; // 패치맵에서 빨간지점 패치값 -1로 변경
+            redPatchMap[redPoint.r][redPoint.c] = 0; // 레드 패치맵에서 그 지점 패치값 없애기
+            k -= 1;
+         }
+         else if(findDt(currentPoint, redPoint, colorMapping) == 1) // 반환값이 1이면(가중치가 0)
+         {
+            colorMapping[redPoint.r][redPoint.c] = 0; // 패치맵에서 빨간지점 패치값 0으로 변경
+         }
+         else
+         {
+            int arr = findDt(currentPoint, redPoint, colorMapping[5][5]); // 오류 안 나나?
+            gotoNextRedpatch(arr, currentPoint, redPoint);
+            currentPoint = redPoint; // 맞나욘
+         }
+      }
+   }
+// 나 울고싶어 얘들아 ㅎㅎ 이 코드 망했어욘 ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ
+
+   
    //redPoint location store.
-   findShortestDistance();
    ff();
 
-   while()
+   
 
 
 
