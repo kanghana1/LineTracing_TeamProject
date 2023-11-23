@@ -20,10 +20,9 @@ Point currentPoint = {0, 0}; // 현재 위치
 Point FinishPoint = {0, 0};
 Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
 int redCount = 0;
-int Qmap[5][5];
 int colorMapping[5][5]; // 본래맵
+float finalQmap[5][5]; // 최종 큐 맵
 // int redPatchMap[5][5]; // 레드패치맵
-
 /*
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
@@ -34,11 +33,6 @@ int min(int a, int b)
    return a < b ? a : b;
 }
 
-
-int max(int a, int b)
-{
-   return a > b ? a : b;
-}
 
 Point minPoint(Point point1, Point point2) {
    Point result;
@@ -72,14 +66,19 @@ Point findShortestDistance(Point currentPosition, Point redPoint[], int redPoint
 }
 */
 
-bool isPointZero(Point point){ // judging, is it 0, 0.
-   return (point.r == 0 && point.c == 0);
-}
-
 // int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
 //     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
 //            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
 // }
+
+int max(int a, int b) {
+   return a > b ? a : b;
+}
+
+int isPointZero(Point point){ // judging, is it 0, 0.
+   return (point.r == 0 && point.c == 0);
+}
+
 
 float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 	float QMap[5][5]; // 큐맵 중 한 개
@@ -90,7 +89,7 @@ float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 			else QMap[i][j] = 0;
 		}
 	}
-	Qmap[p1.r][p1.c] = 1; // 레드포인트 한 개만 넣기
+	QMap[p1.r][p1.c] = 1; // 레드포인트 한 개만 넣기
 
 	for (int i = 0 ; i < 5 ; i++) {
 		for (int j = 0 ; j < 5 ; j++) {
@@ -122,20 +121,19 @@ float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 			}
 		}
 	}
-	return QMap;
+	return QMap; // 타입 다른 이유 설명해주실분 ~^^ 9함~~~~
 }
 
 // Q sum method.
-void sumQmap(Point redP)
-{
-   for(int i=0; i<redCount; i++) // 레드패치 수만큼 반복
-   {
-      float arrayQ[5][5] = oneQmap(redP);
-      for(int j=0; j<5; j++) // 토탈 Q 맵에 모든 레드패치맵 값 더하기
-      {
-         for(int k=0; k<5; k++)
-         {
-            Qmap[j][k] += arrayQ[j][k];
+void sumQmap(Point redArr[]) {
+
+   for(int i=0; i < redCount; i++) {// 레드패치 수만큼 반복
+      Point p = redArr[i];
+      float arrayQ[5][5] = oneQmap(p);
+
+      for(int j=0; j<5; j++) {// 토탈 Q 맵에 모든 레드패치맵 값 더하기
+         for(int k=0; k<5; k++) {
+            finalQmap[j][k] += arrayQ[j][k];
          }
       }
    }
@@ -143,13 +141,10 @@ void sumQmap(Point redP)
 
 
 
-
-
-
-
 // This method calculates the weight from the current location to the red patch located
 //  at the shortest distance to helps the robot achieve optimal movement.
 
+/*
 int findDt(Point start, Point end, int arr[5][5])
 { // !! S: information about the patch, Dt: information about weights.
 
@@ -263,84 +258,9 @@ int findDt(Point start, Point end, int arr[5][5])
 }
 
 
+*/
 
-
-void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
-{
-   int start_r = start_p.r;
-   int start_c = start_p.c;
-   int end_r = end_p.r;
-   int end_c = end_p.c;
-
-   while(start_r != end_r && start_c != end_c)
-	{
-      if(start_r > end_r && start_c > end_c) // move (left)+(up)
-      {
-         if(dt[start_r-1][start_c] > dt[start_r][start_c-1]) // Left is bigger than Up
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-         else if(dt[start_r-1][start_c] < dt[start_r][start_c-1]) // Up is bigger than Left
-         {
-            start_r -= 1; // goUp
-            // 위쪽으로 이동하는 함수 부르기
-         }
-         else // if (Left, Up) is same?????
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-      }
-		else if(start_r > end_r) // move Up... 위쪽으로 갈 건데...
-      {
-         if(start_c < end_c) // 오른쪽으로 가야하면
-         {
-            if(dt[start_r-1][start_c] < dt[start_r][start_c+1]) // 오른쪽 이동
-            {
-               start_c += 1; // goRight
-               // 오른쪽으로 이동하는 함수 부르기
-            }
-            else if(dt[start_r-1][start_c] > dt[start_r][start_c+1]) // 위쪽 이동
-            {
-               start_r -= 1; // goUp
-               // 위쪽으로 이동하는 함수 부르기
-            }
-            else
-            {
-               start_c += 1; // goRight
-               // 오른쪽으로 이동하는 함수 부르기
-            }
-         }
-         else
-         {
-            start_r -= 1; // goUp
-         }
-      }
-      else if(start_r < end_r) // 왼쪽 아래로
-      {
-         if(dt[start_r-1][start_c] > dt[start_r][start_c-1])
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-         else if(dt[start_r-1][start_c] < dt[start_r][start_c+1])
-         {
-            start_r += 1; // goRight
-            // 오른쪽으로 이동하는 함수 부르기
-         }
-      }
-      else // 왼쪽으로만
-      {
-         start_c -= 1;
-         // 왼쪽으로 이동하는 함수 부르기
-      }
-
-		eraseDisplay();
-
-	}
-}
-
+/*
 Point RightUpredPatch() // 맨오른쪽아래 빨간점 위치 반환
 {
    Point redlast = {-1, -1};
@@ -371,29 +291,26 @@ int redisIn()
    return cnt;
 }
 
+*/
+
 task main()
 {
    int mapsize_r = 0, mapsize_c = 0;
    int k = 0;
    Point redPatch[redCount];
 
-   for (int i=0; i<redCount; i++)
-   {
-      sumQmap(redPatch[i]);
-   }
 
-/*
    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
          if (colorMapping[i][j] == 1) { // 컬러맵에서 1이 있으면 그 위치에 똑같이 레드패치맵에 1넣기
-            redPatchMap[i][j] = 1;
             redPatch[k].r = i;
             redPatch[k].c = j;
             k += 1;
          }
       }
    }
-*/
+
+
 
 /*
    while(currentPoint.r != 0 && currentPoint.c != 0)
