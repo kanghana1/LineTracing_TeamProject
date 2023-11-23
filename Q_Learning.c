@@ -72,7 +72,7 @@ float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
 					QMap[i][j] = 0.02;
 				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
+				else if (abs(p1.r - i) + abs(p1.c - j) == 8) {
 					QMap[i][j] = 0.004;
 				}
 			}
