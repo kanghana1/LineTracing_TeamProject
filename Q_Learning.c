@@ -35,9 +35,7 @@ Point currentPosition = {4, 4}; // start point.
 int score = 0; // the number of red patches that robot gets.
 
 float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
-	int r, c;
-	int Qmap[5][5]; // 큐맵 중 한 개
-	
+	float Qmap[5][5]; // 큐맵 중 한 개
 
 	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
 		for (int j = 0 ; j < 5 ; j++) {
@@ -52,7 +50,6 @@ float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 			if (QMap[i][j] == 0) { 
 				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
 					QMap[i][j] = 0.9;
-					cnt++;
 				}
 				else if (abs(p1.r - i) + abs(p1.c - j) == 2) {
 					QMap[i][j] = 0.72;
