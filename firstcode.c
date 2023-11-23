@@ -18,7 +18,7 @@
 
 // This code reter to lecture paper. 
 
-int speed = 35;
+int speed = 20;
 int r = 0;
 int c = 0;
 
@@ -36,7 +36,7 @@ int S[5][5]; // change the name, it was "colorMapping" before.
 
 
 void go(){ // go straight following points. 
-    val = 7;
+    val = 5;
 
     if (getColorName(c2) == 5) // 5 : red // if middle color censor meets red. 
     {
@@ -70,7 +70,7 @@ void go(){ // go straight following points.
 
 void turnLeft(){
     setMotorSpeed(lm, 20);
-    setMotorSpeed(rm, 35);
+    setMotorSpeed(rm, 25);
     sleep(300);
     while (getColorName(c1) > 4){
         setMotorSpeed(lm, -speed * 6/10);
@@ -89,9 +89,9 @@ void turnLeft(){
 }
 
 void turnRight(){
-    setMotorSpeed(lm, 30);
-    setMotorSpeed(rm, 30);
-    sleep(100);
+    setMotorSpeed(lm, 25);
+    setMotorSpeed(rm, 20);
+    sleep(300);
     while (getColorName(c3) > 4){
         setMotorSpeed(lm, speed * 6/10);
         setMotorSpeed(rm, -speed * 6/10);
@@ -116,12 +116,13 @@ void stopMotor(){
 void completeSearch(){
     while(1){
         go();
+        displayBitTextLine(1, "%d %d", row, count);
         if (count == 4){
             if (row == 4) return; //finish
             if (row % 2 == 0){
-                setMotorSpeed(lm, 40);
-                setMotorSpeed(rm, 35);
-                for (int i = 0; i < 4; i++){
+                setMotorSpeed(lm, 25);
+                setMotorSpeed(rm, 20);
+                for (int i = 0; i < 8; i++){ // befoe 4, after 10.
                     if (getColorName(c2) == 5){ // red 
                         if (row % 2 == 0) S[row][count] = 1;
                         else S[row][4-count] = 1;
@@ -139,7 +140,7 @@ void completeSearch(){
                 turnRight();
             }
             else {
-                for(int i = 0; i < 3; i++){
+                for(int i = 0; i < 7; i++){ // before 3. after 9
                     if (getColorName(c2) == 5){
                         if (row % 2 == 0) S[row][count] = 1;
                         else S[row][4-count] = 1;
