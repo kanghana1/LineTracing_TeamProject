@@ -377,6 +377,12 @@ task main()
    int k = 0;
    Point redPatch[redCount];
 
+   for (int i=0; i<redCount; i++)
+   {
+      sumQmap(redPatch[i]);
+   }
+
+/*
    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
          if (colorMapping[i][j] == 1) { // 컬러맵에서 1이 있으면 그 위치에 똑같이 레드패치맵에 1넣기
@@ -387,12 +393,7 @@ task main()
          }
       }
    }
-
-
-   for (int i=0; i<redCount; i++)
-   {
-      sumQmap(redPatch[i]);
-   }
+*/
 
 /*
    while(currentPoint.r != 0 && currentPoint.c != 0)
@@ -432,7 +433,6 @@ task main()
 */
 // 나 울고싶어 얘들아 ㅎㅎ 이 코드 망했어욘 ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ
 
-   
    //redPoint location store.
    ff();
 
