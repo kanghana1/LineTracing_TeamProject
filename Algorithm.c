@@ -20,6 +20,7 @@ Point currentPoint = {0, 0}; // 현재 위치
 Point FinishPoint = {0, 0};
 Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
 int redCount = 0;
+int Qmap[5][5];
 int colorMapping[5][5]; // 본래맵
 int redPatchMap[5][5]; // 레드패치맵
 
@@ -73,6 +74,75 @@ Point findShortestDistance(Point currentPosition, Point redPoint[], int redPoint
 bool isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
+
+int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
+    return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
+           (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
+}
+
+float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
+	float QMap[5][5]; // 큐맵 중 한 개
+
+	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
+		for (int j = 0 ; j < 5 ; j++) {
+			if (colorMapping[i][j] == -1) QMap[i][j] = -1; 
+			else QMap[i][j] = 0;
+		}
+	}
+	Qmap[p1.r][p1.c] = 1; // 레드포인트 한 개만 넣기
+
+	for (int i = 0 ; i < 5 ; i++) {
+		for (int j = 0 ; j < 5 ; j++) {
+			if (QMap[i][j] == 0) { 
+				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
+					QMap[i][j] = 0.9;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 2) {
+					QMap[i][j] = 0.72;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 3) {
+					QMap[i][j] = 0.5;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 4) {
+					QMap[i][j] = 0.3;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 5) {
+					QMap[i][j] = 0.15;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 6) {
+					QMap[i][j] = 0.06;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
+					QMap[i][j] = 0.02;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 8) {
+					QMap[i][j] = 0.004;
+				}
+			}
+		}
+	}
+	return QMap;
+}
+
+// Q sum method.
+void sumQmap(Point redP)
+{
+   for(int i=0; i<redCount; i++) // 레드패치 수만큼 반복
+   {
+      float arrayQ[5][5] = oneQmap(redP);
+      for(int j=0; j<5; j++) // 토탈 Q 맵에 모든 레드패치맵 값 더하기
+      {
+         for(int k=0; k<5; k++)
+         {
+            Qmap[j][k] += arrayQ[j][k];
+         }
+      }
+   }
+}
+
+
+
+
 
 
 
@@ -315,6 +385,12 @@ task main()
             k += 1;
          }
       }
+   }
+
+
+   for (int i=0; i<redCount; i++)
+   {
+      sumQmap(redPatch[i]);
    }
 
 
