@@ -30,8 +30,13 @@ Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘�
 int redCount = 0;
 int Qmap[5][5];
 int colorMapping[5][5]; // 본래맵
+<<<<<<< HEAD
 // int redPatchMap[5][5]; // 레드패치맵
 
+=======
+float finalQmap[5][5]; // 최종 큐 맵
+// int redPatchMap[5][5]; // 레드패치맵
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 /*
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
@@ -41,6 +46,7 @@ int min(int a, int b)
 {
    return a < b ? a : b;
 }
+<<<<<<< HEAD
 */
 Point max(Point a, Point b) // 큰 Point 변수 반환.
 {
@@ -50,6 +56,10 @@ Point max(Point a, Point b) // 큰 Point 변수 반환.
 
 
 /*
+=======
+
+
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 Point minPoint(Point point1, Point point2) {
    Point result;
    result.r = min(point1.r, point2.r);
@@ -82,6 +92,18 @@ Point findShortestDistance(Point currentPosition, Point redPoint[], int redPoint
 }
 */
 
+<<<<<<< HEAD
+=======
+// int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
+//     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
+//            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
+// }
+
+int max(int a, int b) {
+   return a > b ? a : b;
+}
+
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 int isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
@@ -175,6 +197,66 @@ void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
 }
 
 
+float oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
+	float QMap[5][5]; // 큐맵 중 한 개
+
+	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
+		for (int j = 0 ; j < 5 ; j++) {
+			if (colorMapping[i][j] == -1) QMap[i][j] = -1; 
+			else QMap[i][j] = 0;
+		}
+	}
+	QMap[p1.r][p1.c] = 1; // 레드포인트 한 개만 넣기
+
+	for (int i = 0 ; i < 5 ; i++) {
+		for (int j = 0 ; j < 5 ; j++) {
+			if (QMap[i][j] == 0) { 
+				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
+					QMap[i][j] = 0.9;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 2) {
+					QMap[i][j] = 0.72;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 3) {
+					QMap[i][j] = 0.5;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 4) {
+					QMap[i][j] = 0.3;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 5) {
+					QMap[i][j] = 0.15;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 6) {
+					QMap[i][j] = 0.06;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
+					QMap[i][j] = 0.02;
+				}
+				else if (abs(p1.r - i) + abs(p1.c - j) == 8) {
+					QMap[i][j] = 0.004;
+				}
+			}
+		}
+	}
+	return QMap; // 타입 다른 이유 설명해주실분 ~^^ 9함~~~~
+}
+
+// Q sum method.
+void sumQmap(Point redArr[]) {
+
+   for(int i=0; i < redCount; i++) {// 레드패치 수만큼 반복
+      Point p = redArr[i];
+      float arrayQ[5][5] = oneQmap(p);
+
+      for(int j=0; j<5; j++) {// 토탈 Q 맵에 모든 레드패치맵 값 더하기
+         for(int k=0; k<5; k++) {
+            finalQmap[j][k] += arrayQ[j][k];
+         }
+      }
+   }
+}
+
+
 
 
 void gotoBigQWeight()
@@ -248,6 +330,10 @@ void gotoBigQWeight()
 
 // This method calculates the weight from the current location to the red patch located
 //  at the shortest distance to helps the robot achieve optimal movement.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 /*
 int findDt(Point start, Point end, int arr[5][5])
 { // !! S: information about the patch, Dt: information about weights.
@@ -360,6 +446,7 @@ int findDt(Point start, Point end, int arr[5][5])
       return 0; // False. Don't visit this redPatch
    }
 }
+<<<<<<< HEAD
 void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
 {
    int start_r = start_p.r;
@@ -438,6 +525,12 @@ void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
 */
 
 
+=======
+
+
+*/
+
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 /*
 Point RightUpredPatch() // 맨오른쪽아래 빨간점 위치 반환
 {
@@ -470,12 +563,15 @@ int redisIn()
 }
 */
 
+*/
+
 task main()
 {
    initPoint(currentPoint, 0, 0, 0);
    initPoint(FinishPoint, 4, 4, 0);
    int k = 0;
    Point redPatch[redCount];
+
 
    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
@@ -490,6 +586,10 @@ task main()
 
    gotoBigQWeight();
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 /*
    while(currentPoint.r != 0 && currentPoint.c != 0)
    {
@@ -531,4 +631,9 @@ task main()
    //redPoint location store.
    ff();
 
+<<<<<<< HEAD
 }
+=======
+   
+}
+>>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
