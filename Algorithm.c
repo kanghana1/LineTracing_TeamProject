@@ -27,11 +27,11 @@ Point currentPoint; // 현재 위치
 Point FinishPoint;
 Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
 int redCount = 0;
-int Qmap[5][5];
 int colorMapping[5][5]; // 본래맵
 Point finalQmap[5][5]; // 최종 큐 맵
 // int redPatchMap[5][5]; // 레드패치맵
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
+
+
 /*
 float Calculate(Point point1, Point point2){ // calculating distance
    return abs((point1.r + point1.c) - (point2.r + point2.c));
@@ -41,20 +41,7 @@ int min(int a, int b)
 {
    return a < b ? a : b;
 }
-<<<<<<< HEAD
-*/
-Point max(Point a, Point b) // 큰 Point 변수 반환.
-{
-   if(a.v > b.v) return a;
-   else return b;
-}
 
-
-/*
-=======
-
-
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 Point minPoint(Point point1, Point point2) {
    Point result;
    result.r = min(point1.r, point2.r);
@@ -87,8 +74,6 @@ Point findShortestDistance(Point currentPosition, Point redPoint[], int redPoint
 }
 */
 
-<<<<<<< HEAD
-=======
 // int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
 //     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
 //            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
@@ -100,7 +85,6 @@ Point max(Point a, Point b) // 큰 Point 변수 반환.
    else return b;
 }
 
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 int isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
@@ -110,65 +94,6 @@ int isPointZero(Point point){ // judging, is it 0, 0.
 //            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
 // }
 
-Point oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
-	Point QMap[5][5]; // 큐맵 중 한 개
-
-	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
-		for (int j = 0 ; j < 5 ; j++) {
-			if (colorMapping[i][j] == -1) QMap[i][j].v = -1; 
-			else QMap[i][j].v = 0;
-		}
-	}
-	QMap[p1.r][p1.c].v = 1; // 레드포인트 한 개만 넣기
-
-	for (int i = 0 ; i < 5 ; i++) {
-		for (int j = 0 ; j < 5 ; j++) {
-			if (QMap[i][j].v == 0) { 
-				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
-					QMap[i][j].v = 0.9;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 2) {
-					QMap[i][j].v = 0.72;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 3) {
-					QMap[i][j].v = 0.5;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 4) {
-					QMap[i][j].v = 0.3;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 5) {
-					QMap[i][j].v = 0.15;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 6) {
-					QMap[i][j].v = 0.06;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 7) {
-					QMap[i][j].v = 0.02;
-				}
-				else if (abs(p1.r - i) + abs(p1.c - j) == 8) {
-					QMap[i][j].v = 0.004;
-				}
-			}
-		}
-	}
-	return QMap;
-}
-
-// Q sum method.
-void sumQmap(Point redP)
-{
-   for(int i=0; i<redCount; i++) // 레드패치 수만큼 반복
-   {
-      Point arrayQ[5][5] = oneQmap(redP);
-      for(int j=0; j<5; j++) // 토탈 Q 맵에 모든 레드패치맵 값 더하기
-      {
-         for(int k=0; k<5; k++)
-         {
-            Qmap[j][k] += arrayQ[j][k].v;
-         }
-      }
-   }
-}
 
 int derectionNext(Point start, Point end) // 이동해야할 방향을 잡아준다. goNextPoint 함수랑 같이 보면 이해가 쉬워요~
 {
@@ -241,7 +166,7 @@ Point oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 // Q sum method.
 void sumQmap(Point redArr[]) {
 
-   for(int i=0; i < redCount; i++) {// 레드패치 수만큼 반복
+   for(int i = 0; i < redCount; i++) {// 레드패치 수만큼 반복
       Point p = redArr[i];
       Point arrayQ[5][5] = oneQmap(p);
 
@@ -328,11 +253,7 @@ void gotoBigQWeight()
 }
 
 // This method calculates the weight from the current location to the red patch located
-//  at the shortest distance to helps the robot achieve optimal movement.
-<<<<<<< HEAD
-=======
-
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
+//  at the shortest distance to helps the robot achieve optimal movement
 /*
 int findDt(Point start, Point end, int arr[5][5])
 { // !! S: information about the patch, Dt: information about weights.
@@ -445,7 +366,6 @@ int findDt(Point start, Point end, int arr[5][5])
       return 0; // False. Don't visit this redPatch
    }
 }
-<<<<<<< HEAD
 void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
 {
    int start_r = start_p.r;
@@ -524,12 +444,6 @@ void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
 */
 
 
-=======
-
-
-*/
-
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
 /*
 Point RightUpredPatch() // 맨오른쪽아래 빨간점 위치 반환
 {
@@ -562,7 +476,6 @@ int redisIn()
 }
 */
 
-*/
 int derectionNext(Point start, Point end) // 이동해야할 방향을 잡아준다. goNextPoint 함수랑 같이 보면 이해가 쉬워요~
 {
    if(abs(start.r + start.c) - abs(end.r + end.c) > 0) // 아래 or 오른쪽으로
@@ -577,7 +490,6 @@ int derectionNext(Point start, Point end) // 이동해야할 방향을 잡아준
    }
 }
 
-
 void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
 {
    if(derection==1) goUp();
@@ -588,14 +500,19 @@ void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
 }
 
 
-
-
-void gotoBigQWeight()
-{
+task main() {
    initPoint(currentPoint, 0, 0, 0);
    initPoint(FinishPoint, 4, 4, 0);
    int k = 0;
-   Point redPatch[redCount];
+
+   for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+         if (colorMapping[i][j] == 1) { 
+            redCount++;
+         }
+      }
+   }   
+   Point redPatch[redCount]; // 빨간 점 저장
 
    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
@@ -607,56 +524,9 @@ void gotoBigQWeight()
          }
       }
    }
+   sumQmap(redPatch); // finalQmap생성
 
+   gotoBigQWeight();
+   ff(); // 이게뭐야
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
-/*
-   while(currentPoint.r != 0 && currentPoint.c != 0)
-   {
-      if(redCount == 0) // 레드패치수가 0개면
-      {
-         mapsize_r = abs(currentPoint.r- FinishPoint.r) + 1;
-         mapsize_c = abs(currentPoint.c- FinishPoint.c) + 1;
-         int arr[mapsize_r][mapsize_c] = findDt(currentPoint, FinishPoint, colorMapping); // 오류 안 나나??
-         gotoNextRedpatch(arr, currentPoint, FinishPoint);
-      }
-      else if(redCount > 0) // 레드패치수가 0보다 크면
-      {
-         redPoint = findShortestDistance(currentPoint, redPatch, redCount); // 다음 레드패치 위치 구하기
-         if (redisIn() == 0) // 만약 패치수는 많은데, 맵에 1이 없다면?
-         {
-            Point RightUpredPoint = RightUpredPatch(); // 맨오른쪽아래 레드패치지점
-         }
-         else if(findDt(currentPoint, redPoint, colorMapping) == 0) // 반환값이 0이면(가중치가 음수)
-         {
-            colorMapping[redPoint.r][redPoint.c] = -1; // 패치맵에서 빨간지점 패치값 -1로 변경
-            redPatchMap[redPoint.r][redPoint.c] = 0; // 레드 패치맵에서 그 지점 패치값 없애기
-            k -= 1;
-         }
-         else if(findDt(currentPoint, redPoint, colorMapping) == 1) // 반환값이 1이면(가중치가 0)
-         {
-            colorMapping[redPoint.r][redPoint.c] = 0; // 패치맵에서 빨간지점 패치값 0으로 변경
-         }
-         else
-         {
-            int arr = findDt(currentPoint, redPoint, colorMapping[5][5]); // 오류 안 나나?
-            gotoNextRedpatch(arr, currentPoint, redPoint);
-            currentPoint = redPoint; // 맞나욘
-         }
-      }
-   }
-*/
-// 나 울고싶어 얘들아 ㅎㅎ 이 코드 망했어욘 ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ
-
-   //redPoint location store.
-   ff();
-
-<<<<<<< HEAD
 }
-=======
-   
-}
->>>>>>> 0cb1e2c6871e1cd1c0c70ad91107c2093458d845
