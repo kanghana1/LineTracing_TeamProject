@@ -26,9 +26,10 @@ void initPoint(Point point, int ir, int ic, float iv) // Point 변수 초기화 
 Point currentPoint; // 현재 위치
 Point FinishPoint;
 Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
-int redCount = 0;
+int redCount = 0; // 레드 점 세기
 int colorMapping[5][5]; // 본래맵
 Point finalQmap[5][5]; // 최종 큐 맵
+int score = 0;
 // int redPatchMap[5][5]; // 레드패치맵
 
 
@@ -119,7 +120,7 @@ void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
 }
 
 
-Point oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
+Point** oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 	Point QMap[5][5]; // 큐맵 중 한 개
 
 	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
@@ -132,6 +133,8 @@ Point oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 
 	for (int i = 0 ; i < 5 ; i++) {
 		for (int j = 0 ; j < 5 ; j++) {
+         QMap[i][j].r = i; // null방지
+         QMap[i][j].c = j; // null방지
 			if (QMap[i][j].v == 0) { 
 				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
 					QMap[i][j].v = 0.9;
@@ -183,15 +186,15 @@ void sumQmap(Point redArr[]) {
 
 
 
-void gotoBigQWeight()
-{
+int gotoBigQWeight() // 이동 & 점수반환
+{  
    Point next; // 큰 값의 포인트가 들어감
    while(currentPoint.r != 0 && currentPoint.c != 0)
    {
-      Point up = {currentPoint.r-1, currentPoint.c}; // 상방향
-      Point down = {currentPoint.r+1, currentPoint.c}; // 하방향
-      Point left = {currentPoint.r, currentPoint.c-1}; // 좌방향
-      Point right = {currentPoint.r, currentPoint.c+1}; // 우방향
+      Point up = {currentPoint.r-1, currentPoint.c, finalQmap[currentPoint.r-1][currentPoint.c].v}; // 상방향
+      Point down = {currentPoint.r+1, currentPoint.c, finalQmap[currentPoint.r+1][currentPoint.c].v}; // 하방향
+      Point left = {currentPoint.r, currentPoint.c-1, finalQmap[currentPoint.r][currentPoint.c-1].v}; // 좌방향
+      Point right = {currentPoint.r, currentPoint.c+1, finalQmap[currentPoint.r][currentPoint.c+1].v}; // 우방향
 
       /* 만약 {} 초기화 불가면 사용 예정
       initPoint(up, currentPoint.r-1, currentPoint.c, 0);
@@ -200,56 +203,48 @@ void gotoBigQWeight()
       initPoint(right, currentPoint.r, currentPoint.c+1, 0);
       */
 
-      if(currentPoint.r == 4 || currentPoint.c == 4) // 행, 열 중 하나가 4라면
-      {
-         if(currentPoint.r == 4 && currentPoint.c == 4) // 행, 열 둘 다 4라면,
-         {
+      if(currentPoint.r == 4 || currentPoint.c == 4) {// 행, 열 중 하나가 4라면
+         if(currentPoint.r == 4 && currentPoint.c == 4) {// 행, 열 둘 다 4라면,
             next = max(up, left); // 위,왼쪽 비교. ex {4, 3}.
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
             goNextPoint(derec); // 이동
          }
-         else if(currentPoint.r == 4) // 행만 4라면,
-         {
+         else if(currentPoint.r == 4) {// 행만 4라면,
             next = max(max(up, left), right); // 위, 왼쪽, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
             goNextPoint(derec);
          }
-         else //  if(currentPoint.c == 4) 열만 4라면,
-         {
+         else {//  if(currentPoint.c == 4) 열만 4라면,
             next = max(max(up, down), left); // 위, 아래, 왼쪽 비교.
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
             goNextPoint(derec);
          }
       }
-      else if(currentPoint.r == 0 || currentPoint.c == 0) // 행, 열 중 하나가 0이라면,
-      {
-         if(currentPoint.r == 0) // 행이 0이라면,
-         {
+      else if(currentPoint.r == 0 || currentPoint.c == 0) {// 행, 열 중 하나가 0이라면,
+
+         if(currentPoint.r == 0 && currentPoint.c != 0) {// 행이 0이라면,
             next = max(max(down, left), right); // 아래, 왼쪽, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
             goNextPoint(derec);
          }
-         else // 열이 0이라면,
-         {
+         else if(currentPoint.c == 0 && currentPoint.r != 0) {// 열이 0이라면,
             next = max(max(up, down), right); // 위, 아래, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
             goNextPoint(derec);
          }
       }
-      else // 행, 열이 0 or 4가 아니라면
-      {
+      else {// 행, 열이 0 or 4가 아니라면
          next = max(max(up, down), max(left ,right)); // 모든방향(위, 아래, 왼쪽, 오른쪽) 비교. 
          int derec = derectionnext(currentPoint, next);
          currentPoint = next;
          goNextPoint(derec);
       }
    }
-   return;
 }
 
 // This method calculates the weight from the current location to the red patch located
@@ -525,8 +520,7 @@ task main() {
       }
    }
    sumQmap(redPatch); // finalQmap생성
-
+   currentPoint = finalQmap[4][4]; // finalQmap에 값을 모두 넣은 후, currentPoint 값 초기화
    gotoBigQWeight();
-   ff(); // 이게뭐야
 
 }
