@@ -186,7 +186,7 @@ void sumQmap(Point redArr[]) {
 
 
 
-int gotoBigQWeight() // 이동 & 점수반환
+void gotoBigQWeight() // 이동 & 점수반환
 {  
    Point next; // 큰 값의 포인트가 들어감
    while(currentPoint.r != 0 && currentPoint.c != 0)
@@ -205,18 +205,21 @@ int gotoBigQWeight() // 이동 & 점수반환
 
       if(currentPoint.r == 4 || currentPoint.c == 4) {// 행, 열 중 하나가 4라면
          if(currentPoint.r == 4 && currentPoint.c == 4) {// 행, 열 둘 다 4라면,
+            if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++; 
             next = max(up, left); // 위,왼쪽 비교. ex {4, 3}.
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
             goNextPoint(derec); // 이동
          }
          else if(currentPoint.r == 4) {// 행만 4라면,
+            if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
             next = max(max(up, left), right); // 위, 왼쪽, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
             goNextPoint(derec);
          }
          else {//  if(currentPoint.c == 4) 열만 4라면,
+            if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
             next = max(max(up, down), left); // 위, 아래, 왼쪽 비교.
             int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
             currentPoint = next; // 현재위치 갱신
@@ -225,13 +228,15 @@ int gotoBigQWeight() // 이동 & 점수반환
       }
       else if(currentPoint.r == 0 || currentPoint.c == 0) {// 행, 열 중 하나가 0이라면,
 
-         if(currentPoint.r == 0 && currentPoint.c != 0) {// 행이 0이라면,
+         if(currentPoint.r == 0) {// 행이 0이라면,
+            if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
             next = max(max(down, left), right); // 아래, 왼쪽, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
             goNextPoint(derec);
          }
-         else if(currentPoint.c == 0 && currentPoint.r != 0) {// 열이 0이라면,
+         else if(currentPoint.c == 0) {// 열이 0이라면,
+            if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
             next = max(max(up, down), right); // 위, 아래, 오른쪽 비교. 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
@@ -239,6 +244,7 @@ int gotoBigQWeight() // 이동 & 점수반환
          }
       }
       else {// 행, 열이 0 or 4가 아니라면
+         if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
          next = max(max(up, down), max(left ,right)); // 모든방향(위, 아래, 왼쪽, 오른쪽) 비교. 
          int derec = derectionnext(currentPoint, next);
          currentPoint = next;
@@ -522,5 +528,6 @@ task main() {
    sumQmap(redPatch); // finalQmap생성
    currentPoint = finalQmap[4][4]; // finalQmap에 값을 모두 넣은 후, currentPoint 값 초기화
    gotoBigQWeight();
+   displayBigTextLine(1,"score : %d",score);
 
 }
