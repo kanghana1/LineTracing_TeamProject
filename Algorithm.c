@@ -17,70 +17,22 @@ typedef struct Point {
    float v;
 } Point;
 
-void initPoint(Point point, int ir, int ic, float iv) // Point 변수 초기화 함수
+void initPoint(Point point, int ir, int ic, float iv) // initialize Point variable function
 {
    point.r = ir;
    point.c = ic;
    point.v = iv;
 }
-Point currentPoint; // 현재 위치
+Point currentPoint;
 Point FinishPoint;
-Point redPoint; // 최단거리 레드패치 찾는 걸로 초기화를 해줘야함
-int redCount = 0; // 레드 점 세기
-int colorMapping[5][5]; // 본래맵
-Point finalQmap[5][5]; // 최종 큐 맵
+Point redPoint; 
+int redCount = 0; // count red point
+int colorMapping[5][5];
+Point finalQmap[5][5]; // total Q map
 int score = 0;
-// int redPatchMap[5][5]; // 레드패치맵
 
 
-/*
-float Calculate(Point point1, Point point2){ // calculating distance
-   return abs((point1.r + point1.c) - (point2.r + point2.c));
-}
-
-int min(int a, int b)
-{
-   return a < b ? a : b;
-}
-
-Point minPoint(Point point1, Point point2) {
-   Point result;
-   result.r = min(point1.r, point2.r);
-   result.c = min(point1.c, point2.c);
-   return result;
-}
-
-Point maxPoint(Point point1, Point point2) {
-   Point result;
-   result.r = max(point1.r, point2.r);
-   result.c = max(point1.c, point2.c);
-   return result;
-}
-
-
-Point findShortestDistance(Point currentPosition, Point redPoint[], int redPointCount){ // send redPoint array. compare each elements
-	float shortestDistance = MAX_DISTANCE;
-	Point shortest_redPatch;
-
-	for (int i = 0; i < redPointCount; i++){
-		float distance = Calculate(currentPosition, redPoint[i]);
-		if (distance <= shortestDistance) {
-			shortestDistance = distance;
-			shortest_redPatch.r = redPoint[i].r;
-			shortest_redPatch.c = redPoint[i].c;
-		}
-	}
-
-	return shortest_redPatch; // it returns shortest_redPatch location x, y
-}
-*/
-
-// int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
-//     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
-//            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
-// }
-
-Point max(Point a, Point b) // 큰 Point 변수 반환.
+Point max(Point a, Point b) // return max point
 {
    if(a.v > b.v) return a;
    else return b;
@@ -90,51 +42,21 @@ int isPointZero(Point point){ // judging, is it 0, 0.
    return (point.r == 0 && point.c == 0);
 }
 
-// int isSafe(int row, int col, int array[5][5], int visited[5][5]) { // 갈 수 있는 곳인지 판별하는 함수
-//     return (row >= 0) && (row < 5) && (col >= 0) && (col < 5) && // 좌표가 범위 내에 있고,
-//            (array[row][col] != -1) && !visited[row][col]; // 장애물(-1)이 없는지
-// }
+Point** oneQmap(Point p1) { 
+	Point QMap[5][5]; 
 
-
-int derectionNext(Point start, Point end) // 이동해야할 방향을 잡아준다. goNextPoint 함수랑 같이 보면 이해가 쉬워요~
-{
-   if(abs(start.r + start.c) - abs(end.r + end.c) > 0) // 아래 or 오른쪽으로
-   {
-      if(start.r < end.r) return 2;// 아래라면
-      else return 4; // 오른쪽이라면
-   }
-   else // 위로 or 왼쪽으로
-   {
-      if(start.r > end.r) return 1; // 위라면
-      else return 3; // 왼쪽이라면
-   }
-}
-
-void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
-{
-   if(derection==1) goUp();
-   else if(derection==2) godown();
-   else if(derection==3) godown();
-   else if(derection==4) godown();
-   else return;
-}
-
-
-Point** oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
-	Point QMap[5][5]; // 큐맵 중 한 개
-
-	for (int i = 0 ; i < 5 ; i++) { // 파란점 외에는 0으로 초기화
+	for (int i = 0 ; i < 5 ; i++) { //  initalized to 0 excluding the blue point. 
 		for (int j = 0 ; j < 5 ; j++) {
 			if (colorMapping[i][j] == -1) QMap[i][j].v = -1; 
 			else QMap[i][j].v = 0;
 		}
 	}
-	QMap[p1.r][p1.c].v = 1; // 레드포인트 한 개만 넣기
+	QMap[p1.r][p1.c].v = 1; // input redpoint 
 
 	for (int i = 0 ; i < 5 ; i++) {
 		for (int j = 0 ; j < 5 ; j++) {
-         QMap[i][j].r = i; // null방지
-         QMap[i][j].c = j; // null방지
+         QMap[i][j].r = i; // defense null
+         QMap[i][j].c = j; // defense null
 			if (QMap[i][j].v == 0) { 
 				if (abs(p1.r - i) + abs(p1.c - j) == 1) {
 					QMap[i][j].v = 0.9;
@@ -163,18 +85,18 @@ Point** oneQmap(Point p1) { // 예를 들어 레드포인트가 0,1 일 떄
 			}
 		}
 	}
-	return QMap; // 타입 다른 이유 설명해주실분 ~^^ 9함~~~~
+	return QMap;
 }
 
 // Q sum method.
 void sumQmap(Point redArr[]) {
 
-   for(int i = 0; i < redCount; i++) {// 레드패치 수만큼 반복
+   for(int i = 0; i < redCount; i++) {// repeat redPatch length
       Point p = redArr[i];
       Point arrayQ[5][5] = oneQmap(p);
 
-      for(int j=0; j<5; j++) {// 토탈 Q 맵에 모든 레드패치맵 값 더하기
-         for(int k=0; k<5; k++) {
+      for(int j=0; j<5; j++) {// add all weights and make finalQmap
+         for(int k=0; k<5; k++) { 
             finalQmap[j][k].r = j;
             finalQmap[j][k].c = k;
             finalQmap[j][k].v += arrayQ[j][k].v;
@@ -186,9 +108,9 @@ void sumQmap(Point redArr[]) {
 
 
 
-void gotoBigQWeight() // 이동 & 점수반환
+void gotoBigQWeight() // move and count score
 {  
-   Point next; // 큰 값의 포인트가 들어감
+   Point next; // store next point
    while(currentPoint.r != 0 && currentPoint.c != 0)
    {
       Point up = {currentPoint.r-1, currentPoint.c, finalQmap[currentPoint.r-1][currentPoint.c].v}; // 상방향
@@ -196,56 +118,56 @@ void gotoBigQWeight() // 이동 & 점수반환
       Point left = {currentPoint.r, currentPoint.c-1, finalQmap[currentPoint.r][currentPoint.c-1].v}; // 좌방향
       Point right = {currentPoint.r, currentPoint.c+1, finalQmap[currentPoint.r][currentPoint.c+1].v}; // 우방향
 
-      /* 만약 {} 초기화 불가면 사용 예정
+      /* if {} can't initialize, we used it.
       initPoint(up, currentPoint.r-1, currentPoint.c, 0);
       initPoint(down, currentPoint.r+1, currentPoint.c, 0);
       initPoint(left, currentPoint.r, currentPoint.c-1, 0);
       initPoint(right, currentPoint.r, currentPoint.c+1, 0);
       */
 
-      if(currentPoint.r == 4 || currentPoint.c == 4) {// 행, 열 중 하나가 4라면
-         if(currentPoint.r == 4 && currentPoint.c == 4) {// 행, 열 둘 다 4라면,
+      if(currentPoint.r == 4 || currentPoint.c == 4) {
+         if(currentPoint.r == 4 && currentPoint.c == 4) {
             if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++; 
-            next = max(up, left); // 위,왼쪽 비교. ex {4, 3}.
-            int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
-            currentPoint = next; // 현재위치 갱신
-            goNextPoint(derec); // 이동
+            next = max(up, left); 
+            int derec = derectionnext(currentPoint, next); 
+            currentPoint = next; 
+            goNextPoint(derec); 
          }
-         else if(currentPoint.r == 4) {// 행만 4라면,
+         else if(currentPoint.r == 4) {
             if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
-            next = max(max(up, left), right); // 위, 왼쪽, 오른쪽 비교. 
-            int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
-            currentPoint = next; // 현재위치 갱신
+            next = max(max(up, left), right);
+            int derec = derectionnext(currentPoint, next); 
+            currentPoint = next; 
             goNextPoint(derec);
          }
-         else {//  if(currentPoint.c == 4) 열만 4라면,
+         else {
             if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
-            next = max(max(up, down), left); // 위, 아래, 왼쪽 비교.
-            int derec = derectionnext(currentPoint, next); // derec는 방향 잡기
-            currentPoint = next; // 현재위치 갱신
+            next = max(max(up, down), left); 
+            int derec = derectionnext(currentPoint, next); 
+            currentPoint = next; 
             goNextPoint(derec);
          }
       }
-      else if(currentPoint.r == 0 || currentPoint.c == 0) {// 행, 열 중 하나가 0이라면,
+      else if(currentPoint.r == 0 || currentPoint.c == 0) {
 
-         if(currentPoint.r == 0) {// 행이 0이라면,
+         if(currentPoint.r == 0) {
             if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
-            next = max(max(down, left), right); // 아래, 왼쪽, 오른쪽 비교. 
+            next = max(max(down, left), right); 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
             goNextPoint(derec);
          }
-         else if(currentPoint.c == 0) {// 열이 0이라면,
+         else if(currentPoint.c == 0) {
             if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
-            next = max(max(up, down), right); // 위, 아래, 오른쪽 비교. 
+            next = max(max(up, down), right); 
             int derec = derectionnext(currentPoint, next);
             currentPoint = next;
             goNextPoint(derec);
          }
       }
-      else {// 행, 열이 0 or 4가 아니라면
+      else {
          if (colorMapping[currentPoint.r][currentPoint.c] == 1) score++;
-         next = max(max(up, down), max(left ,right)); // 모든방향(위, 아래, 왼쪽, 오른쪽) 비교. 
+         next = max(max(up, down), max(left ,right)); 
          int derec = derectionnext(currentPoint, next);
          currentPoint = next;
          goNextPoint(derec);
@@ -253,199 +175,6 @@ void gotoBigQWeight() // 이동 & 점수반환
    }
 }
 
-// This method calculates the weight from the current location to the red patch located
-//  at the shortest distance to helps the robot achieve optimal movement
-/*
-int findDt(Point start, Point end, int arr[5][5])
-{ // !! S: information about the patch, Dt: information about weights.
-
-   Point Small, Large;
-   int Small_r, Small_c, Large_r, Large_c;
-   
-   Small = minPoint(start, end); // (자른 배열의 시작지점 구하기)
-   Large = maxPoint(start, end); // (자른 배열의 끝지점 구하기)
-
-   Small_r = Small.r;
-   Small_c = Small.c;
-   Large_r = Large.r;
-   Large_c = Large.c;
-
-   Point array_Start = {Small_r, Small_c}; // start point of the original array (본래 배열의 시작지점)
-   Point array_End = {Large_r, Large_c}; // end point of the original array (본래 배열의 끝지점)
-
-   int size_r = abs(start.r - end.r) + 1; // array r_size (자른 배열의 r사이즈)
-   int size_c = abs(start.c - end.c) + 1; // array c_size (자른 배열의 c사이즈)
-
-   int smallDt[size_r][size_c]; // define small_array of Dt (가중치 배열인 Dt 선언)
-   int smallS[size_r][size_c]; // define small_array of S (패치의 위치 배열인 S 선언)
-
-   for (int i = 0; i < size_r; i++) // Bring the patch of original array. In smallS
-   {                                // (smallS에다가 자른 배열만큼에 해당하는 본래의 패치 정보를 불러옴)
-      for (int j = 0; j < size_c; j++)
-      {
-         smallS[i][j] = arr[array_Start.r + i][array_Start.c + j]; // 본래의 배열에서 시작지점부터 불러옴
-      }
-   }
-
-
-   if(start.r > end.r && start.c > end.c) // direction Left and Up (왼쪽, 위 이동할때의 가중치계산)
-   {
-      for(int i=start.r; i>=end.r; i--) // Weight calculation about small array.
-	   {
-		   for(int j=start.c; j>=end.c; j--)
-			   {
-			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
-			   else if(i==start.r) smallDt[i][j] = smallDt[i][j+1] + smallS[i][j]; // 왼쪽 방향 가중치
-			   else if(j==start.c) smallDt[i][j] = smallDt[i+1][j] + smallS[i][j]; // 위쪽방향 가중치
-			   else smallDt[i][j] = max(smallDt[i+1][j], smallDt[i][j+1]) + smallS[i][j];
-		   	}
-	   }
-   }
-   else if(start.r > end.r) // direction Up and... (위쪽으로 이동할 건데..)
-   {
-      if(start.c < end.c) // direction Up and Right (오른쪽으로도 갈 때의 가중치 계산)
-      {
-         for(int i=start.r; i>=end.r; i--)
-	      {
-		      for(int j=start.c; j<=end.c; j++)
-			      {
-			      if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
-			      else if(i==start.r) smallDt[i][j] = smallDt[i][j-1] + smallS[i][j]; // 오른쪽 방향 가중치
-			      else if(j==start.c) smallDt[i][j] = smallDt[i+1][j] + smallS[i][j]; // 위쪽 방향 가중치
-			      else smallDt[i][j] = max(smallDt[i+1][j], smallDt[i][j-1]) + smallS[i][j];
-		   	   }
-	      }
-      }
-      else // start.c==end.c. because of (start.r > end.r) is included Left and Up. direction Up.
-      {    // (이건 무조건 start.c==end.c. (start.c > end.c)는 이미 위 if문에 (왼쪽, 위) 이동에 포함되어있기 때문. 위쪽으로만의 가중치 계산)
-         for(int i=start.r; i>=end.r; i--)
-	      {
-		      for(int j=start.c; j<=end.c; j--)
-			      {
-			      if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
-			      else smallDt[i][j] = smallDt[i+1][j] + smallS[i][j];
-		   	   }
-	      }
-      }
-   }
-   else if(start.r < end.r) // direction down and Left (아래로 가면서 왼쪽으로 갈 때의 가중치 계산)
-   {                        // 오른쪽만 가거나, 아래만 가거나, (오른쪽, 아래)로 가는 경우의 수는 존재할 수 없다.
-      for(int i=start.r; i<=end.r; i++) // Weight calculation about small array.
-	   {
-		   for(int j=start.c; j>=end.c; j--)
-			   {
-			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
-			   else if(i==start.r) smallDt[i][j] = smallDt[i][j+1] + smallS[i][j]; // 왼쪽 방향 가중치
-			   else if(j==start.c) smallDt[i][j] = smallDt[i-1][j] + smallS[i][j]; // 아래쪽 방향 가중치
-			   else smallDt[i][j] = max(smallDt[i-1][j], smallDt[i][j+1]) + smallS[i][j];
-		   	}
-	   }
-   }
-   else // start.r == end.r direction Left (왼쪽으로만 갈 때의 가중치 계산)
-   {
-      for(int i=start.r; i>=end.r; i--) // Weight calculation about small array.
-	   {
-		   for(int j=start.c; j>=end.c; j--)
-			   {
-			   if(i==start.r && j==start.c) smallDt[i][j] = smallS[i][j];
-			   else smallDt[i][j] = smallDt[i][j+1] + smallS[i][j];
-		   	}
-	   }
-   }
-
-
-   if (smallDt[end.r][end.c] > 0) // (도착지점의 가중치가 양수면 배열 반환)
-   {
-      return smallDt; // return an array of weights to go from (start point) to (end point)
-   }
-   else if(smallDt[end.r][end.c] == 0)
-   {
-      return 1; // 1인 이유는 main에서 설명
-   }
-   else
-   {
-      return 0; // False. Don't visit this redPatch
-   }
-}
-void gotoNextRedpatch(int dt[5][5], Point start_p, Point end_p)
-{
-   int start_r = start_p.r;
-   int start_c = start_p.c;
-   int end_r = end_p.r;
-   int end_c = end_p.c;
-
-   while(start_r != end_r && start_c != end_c)
-	{
-      if(start_r > end_r && start_c > end_c) // move (left)+(up)
-      {
-         if(dt[start_r-1][start_c] > dt[start_r][start_c-1]) // Left is bigger than Up
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-         else if(dt[start_r-1][start_c] < dt[start_r][start_c-1]) // Up is bigger than Left
-         {
-            start_r -= 1; // goUp
-            // 위쪽으로 이동하는 함수 부르기
-         }
-         else // if (Left, Up) is same?????
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-      }
-		else if(start_r > end_r) // move Up... 위쪽으로 갈 건데...
-      {
-         if(start_c < end_c) // 오른쪽으로 가야하면
-         {
-            if(dt[start_r-1][start_c] < dt[start_r][start_c+1]) // 오른쪽 이동
-            {
-               start_c += 1; // goRight
-               // 오른쪽으로 이동하는 함수 부르기
-            }
-            else if(dt[start_r-1][start_c] > dt[start_r][start_c+1]) // 위쪽 이동
-            {
-               start_r -= 1; // goUp
-               // 위쪽으로 이동하는 함수 부르기
-            }
-            else
-            {
-               start_c += 1; // goRight
-               // 오른쪽으로 이동하는 함수 부르기
-            }
-         }
-         else
-         {
-            start_r -= 1; // goUp
-         }
-      }
-      else if(start_r < end_r) // 왼쪽 아래로
-      {
-         if(dt[start_r-1][start_c] > dt[start_r][start_c-1])
-         {
-            start_c -= 1; // goLeft
-            // 왼쪽으로 이동하는 함수 부르기
-         }
-         else if(dt[start_r-1][start_c] < dt[start_r][start_c+1])
-         {
-            start_r += 1; // goRight
-            // 오른쪽으로 이동하는 함수 부르기
-         }
-      }
-      else // 왼쪽으로만
-      {
-         start_c -= 1;
-         // 왼쪽으로 이동하는 함수 부르기
-      }
-
-		eraseDisplay();
-
-	}
-}
-*/
-
-
-/*
 Point RightUpredPatch() // 맨오른쪽아래 빨간점 위치 반환
 {
    Point redlast = {-1, -1};
@@ -477,21 +206,21 @@ int redisIn()
 }
 */
 
-int derectionNext(Point start, Point end) // 이동해야할 방향을 잡아준다. goNextPoint 함수랑 같이 보면 이해가 쉬워요~
+int derectionNext(Point start, Point end) // It determines the direction to move. It is easier to understand when seen together with the goNextPoint function.
 {
-   if(abs(start.r + start.c) - abs(end.r + end.c) > 0) // 아래 or 오른쪽으로
+   if(abs(start.r + start.c) - abs(end.r + end.c) > 0) // under or right
    {
-      if(start.r < end.r) return 2;// 아래라면
-      else return 4; // 오른쪽이라면
+      if(start.r < end.r) return 2;// under
+      else return 4; // right
    }
-   else // 위로 or 왼쪽으로
+   else // up or left
    {
-      if(start.r > end.r) return 1; // 위라면
-      else return 3; // 왼쪽이라면
+      if(start.r > end.r) return 1; // up
+      else return 3; // left
    }
 }
 
-void goNextPoint(int derection) // 전달받은 방향을 이용해 이동
+void goNextPoint(int derection) //  move by using direction recieved
 {
    if(derection==1) goUp();
    else if(derection==2) godown();
@@ -513,20 +242,20 @@ task main() {
          }
       }
    }   
-   Point redPatch[redCount]; // 빨간 점 저장
+   Point redPatch[redCount]; // store red point
 
    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-         if (colorMapping[i][j] == 1) { // 컬러맵에서 1이 있으면 그 위치에 똑같이 레드패치맵에 1넣기
+         if (colorMapping[i][j] == 1) { // input red point in redPatch arr
             redPatch[k].r = i;
             redPatch[k].c = j;
-            redPatch[k].v = 1; // 혹시 오류날까봐 넣음
+            redPatch[k].v = 1; // depense error
             k += 1;
          }
       }
    }
-   sumQmap(redPatch); // finalQmap생성
-   currentPoint = finalQmap[4][4]; // finalQmap에 값을 모두 넣은 후, currentPoint 값 초기화
+   sumQmap(redPatch); // make finalQmap
+   currentPoint = finalQmap[4][4]; // initialize currentPoint after put all in finalQmap
    gotoBigQWeight();
    displayBigTextLine(1,"score : %d",score);
 
